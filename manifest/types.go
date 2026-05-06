@@ -72,9 +72,9 @@ type AppSpec struct {
 	Locale              []string       `yaml:"locale" json:"locale"`
 	Doc                 string         `yaml:"doc" json:"doc"`
 	License             []struct {
-		Text string `yaml:"text"`
-		URL  string `yaml:"url"`
-	} `yaml:"license"`
+		Text string `yaml:"text" json:"text"`
+		URL  string `yaml:"url" json:"url"`
+	} `yaml:"license" json:"license"`
 }
 
 type Hardware struct {
@@ -223,22 +223,22 @@ type ResourceRequirement struct {
 
 type ResourceMode struct {
 	Mode                string `yaml:"mode" json:"mode"`
-	ResourceRequirement `yaml:",inline"`
+	ResourceRequirement `yaml:",inline" json:",inline"`
 }
 
 // Middleware describe middleware config.
 type Middleware struct {
-	Postgres      *PostgresConfig      `yaml:"postgres,omitempty"`
-	Redis         *RedisConfig         `yaml:"redis,omitempty"`
-	MongoDB       *MongodbConfig       `yaml:"mongodb,omitempty"`
-	Nats          *NatsConfig          `yaml:"nats,omitempty"`
-	Minio         *MinioConfig         `yaml:"minio,omitempty"`
-	RabbitMQ      *RabbitMQConfig      `yaml:"rabbitmq,omitempty"`
-	Elasticsearch *ElasticsearchConfig `yaml:"elasticsearch,omitempty"`
-	MariaDB       *MariaDBConfig       `yaml:"mariadb,omitempty"`
-	MySQL         *MySQLConfig         `yaml:"mysql,omitempty"`
-	Argo          *ArgoConfig          `yaml:"argo,omitempty"`
-	ClickHouse    *ClickHouseConfig    `yaml:"clickHouse,omitempty"`
+	Postgres      *PostgresConfig      `yaml:"postgres,omitempty" json:"postgres,omitempty"`
+	Redis         *RedisConfig         `yaml:"redis,omitempty" json:"redis,omitempty"`
+	MongoDB       *MongodbConfig       `yaml:"mongodb,omitempty" json:"mongodb,omitempty"`
+	Nats          *NatsConfig          `yaml:"nats,omitempty" json:"nats,omitempty"`
+	Minio         *MinioConfig         `yaml:"minio,omitempty" json:"minio,omitempty"`
+	RabbitMQ      *RabbitMQConfig      `yaml:"rabbitmq,omitempty" json:"rabbitmq,omitempty"`
+	Elasticsearch *ElasticsearchConfig `yaml:"elasticsearch,omitempty" json:"elasticsearch,omitempty"`
+	MariaDB       *MariaDBConfig       `yaml:"mariadb,omitempty" json:"mariadb,omitempty"`
+	MySQL         *MySQLConfig         `yaml:"mysql,omitempty" json:"mysql,omitempty"`
+	Argo          *ArgoConfig          `yaml:"argo,omitempty" json:"argo,omitempty"`
+	ClickHouse    *ClickHouseConfig    `yaml:"clickHouse,omitempty" json:"clickHouse,omitempty"`
 }
 
 // Database specify database name and if distributed.
@@ -289,12 +289,12 @@ type ElasticsearchConfig struct {
 }
 
 type Index struct {
-	Name string `json:"name"`
+	Name string `yaml:"name" json:"name"`
 }
 
 // RedisConfig contains fields for redis config.
 type RedisConfig struct {
-	Password  string `yaml:"password,omitempty" json:"password"`
+	Password  string `yaml:"password,omitempty" json:"password,omitempty"`
 	Namespace string `yaml:"namespace" json:"namespace"`
 }
 

@@ -57,5 +57,6 @@ kube::codegen::gen_client \
     --output-dir "${SCRIPT_ROOT}/pkg/generated" \
     --output-pkg "${THIS_PKG}/pkg/generated" \
     --boilerplate "${SCRIPT_ROOT}/hack/boilerplate.go.txt" \
+    --plural-exceptions "Terminus:Terminus" \
     "${SCRIPT_ROOT}/api"
 

@@ -13,10 +13,10 @@ import (
 	gentype "k8s.io/client-go/gentype"
 )
 
-// TerminusesGetter has a method to return a TerminusInterface.
+// TerminusGetter has a method to return a TerminusInterface.
 // A group's client should implement this interface.
-type TerminusesGetter interface {
-	Terminuses() TerminusInterface
+type TerminusGetter interface {
+	Terminus() TerminusInterface
 }
 
 // TerminusInterface has methods to work with Terminus resources.
@@ -34,16 +34,16 @@ type TerminusInterface interface {
 	TerminusExpansion
 }
 
-// terminuses implements TerminusInterface
-type terminuses struct {
+// terminus implements TerminusInterface
+type terminus struct {
 	*gentype.ClientWithList[*sysbytetradeiov1alpha1.Terminus, *sysbytetradeiov1alpha1.TerminusList]
 }
 
-// newTerminuses returns a Terminuses
-func newTerminuses(c *SysV1alpha1Client) *terminuses {
-	return &terminuses{
+// newTerminus returns a Terminus
+func newTerminus(c *SysV1alpha1Client) *terminus {
+	return &terminus{
 		gentype.NewClientWithList[*sysbytetradeiov1alpha1.Terminus, *sysbytetradeiov1alpha1.TerminusList](
-			"terminuses",
+			"terminus",
 			c.RESTClient(),
 			scheme.ParameterCodec,
 			"",

@@ -9,10 +9,10 @@ import (
 	cache "k8s.io/client-go/tools/cache"
 )
 
-// TerminusLister helps list Terminuses.
+// TerminusLister helps list Terminus.
 // All objects returned here must be treated as read-only.
 type TerminusLister interface {
-	// List lists all Terminuses in the indexer.
+	// List lists all Terminus in the indexer.
 	// Objects returned here must be treated as read-only.
 	List(selector labels.Selector) (ret []*sysbytetradeiov1alpha1.Terminus, err error)
 	// Get retrieves the Terminus from the index for a given name.

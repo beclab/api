@@ -12,8 +12,8 @@ type Interface interface {
 	AppEnvs() AppEnvInformer
 	// SystemEnvs returns a SystemEnvInformer.
 	SystemEnvs() SystemEnvInformer
-	// Terminuses returns a TerminusInformer.
-	Terminuses() TerminusInformer
+	// Terminus returns a TerminusInformer.
+	Terminus() TerminusInformer
 	// UserEnvs returns a UserEnvInformer.
 	UserEnvs() UserEnvInformer
 }
@@ -39,8 +39,8 @@ func (v *version) SystemEnvs() SystemEnvInformer {
 	return &systemEnvInformer{factory: v.factory, tweakListOptions: v.tweakListOptions}
 }
 
-// Terminuses returns a TerminusInformer.
-func (v *version) Terminuses() TerminusInformer {
+// Terminus returns a TerminusInformer.
+func (v *version) Terminus() TerminusInformer {
 	return &terminusInformer{factory: v.factory, tweakListOptions: v.tweakListOptions}
 }
 

@@ -49,14 +49,14 @@ type AppSpec struct {
 	PromoteVideo        string         `yaml:"promoteVideo,omitempty" json:"promoteVideo,omitempty"`
 	SubCategory         string         `yaml:"subCategory,omitempty" json:"subCategory,omitempty"`
 	Developer           string         `yaml:"developer,omitempty" json:"developer,omitempty"`
-	RequiredMemory      string         `yaml:"requiredMemory" json:"requiredMemory"`
-	RequiredDisk        string         `yaml:"requiredDisk" json:"requiredDisk"`
-	RequiredGPU         string         `yaml:"requiredGpu" json:"requiredGpu"`
-	RequiredCPU         string         `yaml:"requiredCpu" json:"requiredCpu"`
-	LimitedMemory       string         `yaml:"limitedMemory" json:"limitedMemory"`
-	LimitedDisk         string         `yaml:"limitedDisk" json:"limitedDisk"`
-	LimitedGPU          string         `yaml:"limitedGpu" json:"limitedGpu"`
-	LimitedCPU          string         `yaml:"limitedCpu" json:"limitedCpu"`
+	RequiredMemory      string         `yaml:"requiredMemory,omitempty" json:"requiredMemory,omitempty"`
+	RequiredDisk        string         `yaml:"requiredDisk,omitempty" json:"requiredDisk,omitempty"`
+	RequiredGPU         string         `yaml:"requiredGpu,omitempty" json:"requiredGpu,omitempty"`
+	RequiredCPU         string         `yaml:"requiredCpu,omitempty" json:"requiredCpu,omitempty"`
+	LimitedMemory       string         `yaml:"limitedMemory,omitempty" json:"limitedMemory,omitempty"`
+	LimitedDisk         string         `yaml:"limitedDisk,omitempty" json:"limitedDisk,omitempty"`
+	LimitedGPU          string         `yaml:"limitedGpu,omitempty" json:"limitedGpu,omitempty"`
+	LimitedCPU          string         `yaml:"limitedCpu,omitempty" json:"limitedCpu,omitempty"`
 	SupportClient       SupportClient  `yaml:"supportClient,omitempty" json:"supportClient,omitempty"`
 	RunAsUser           bool           `yaml:"runAsUser" json:"runAsUser"`
 	RunAsInternal       bool           `yaml:"runAsInternal" json:"runAsInternal"`

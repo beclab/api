@@ -14,7 +14,7 @@ type SysV1alpha1Interface interface {
 	RESTClient() rest.Interface
 	AppEnvsGetter
 	SystemEnvsGetter
-	TerminusesGetter
+	TerminusGetter
 	UserEnvsGetter
 }
 
@@ -31,8 +31,8 @@ func (c *SysV1alpha1Client) SystemEnvs() SystemEnvInterface {
 	return newSystemEnvs(c)
 }
 
-func (c *SysV1alpha1Client) Terminuses() TerminusInterface {
-	return newTerminuses(c)
+func (c *SysV1alpha1Client) Terminus() TerminusInterface {
+	return newTerminus(c)
 }
 
 func (c *SysV1alpha1Client) UserEnvs(namespace string) UserEnvInterface {

@@ -8,18 +8,18 @@ import (
 	gentype "k8s.io/client-go/gentype"
 )
 
-// fakeTerminuses implements TerminusInterface
-type fakeTerminuses struct {
+// fakeTerminus implements TerminusInterface
+type fakeTerminus struct {
 	*gentype.FakeClientWithList[*v1alpha1.Terminus, *v1alpha1.TerminusList]
 	Fake *FakeSysV1alpha1
 }
 
-func newFakeTerminuses(fake *FakeSysV1alpha1) sysbytetradeiov1alpha1.TerminusInterface {
-	return &fakeTerminuses{
+func newFakeTerminus(fake *FakeSysV1alpha1) sysbytetradeiov1alpha1.TerminusInterface {
+	return &fakeTerminus{
 		gentype.NewFakeClientWithList[*v1alpha1.Terminus, *v1alpha1.TerminusList](
 			fake.Fake,
 			"",
-			v1alpha1.SchemeGroupVersion.WithResource("terminuses"),
+			v1alpha1.SchemeGroupVersion.WithResource("terminus"),
 			v1alpha1.SchemeGroupVersion.WithKind("Terminus"),
 			func() *v1alpha1.Terminus { return &v1alpha1.Terminus{} },
 			func() *v1alpha1.TerminusList { return &v1alpha1.TerminusList{} },

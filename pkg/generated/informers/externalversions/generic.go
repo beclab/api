@@ -52,8 +52,8 @@ func (f *sharedInformerFactory) ForResource(resource schema.GroupVersionResource
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Sys().V1alpha1().AppEnvs().Informer()}, nil
 	case sysbytetradeiov1alpha1.SchemeGroupVersion.WithResource("systemenvs"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Sys().V1alpha1().SystemEnvs().Informer()}, nil
-	case sysbytetradeiov1alpha1.SchemeGroupVersion.WithResource("terminuses"):
-		return &genericInformer{resource: resource.GroupResource(), informer: f.Sys().V1alpha1().Terminuses().Informer()}, nil
+	case sysbytetradeiov1alpha1.SchemeGroupVersion.WithResource("terminus"):
+		return &genericInformer{resource: resource.GroupResource(), informer: f.Sys().V1alpha1().Terminus().Informer()}, nil
 	case sysbytetradeiov1alpha1.SchemeGroupVersion.WithResource("userenvs"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Sys().V1alpha1().UserEnvs().Informer()}, nil
 

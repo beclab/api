@@ -17,7 +17,7 @@ import (
 )
 
 // TerminusInformer provides access to a shared informer and lister for
-// Terminuses.
+// Terminus.
 type TerminusInformer interface {
 	Informer() cache.SharedIndexInformer
 	Lister() sysbytetradeiov1alpha1.TerminusLister
@@ -45,25 +45,25 @@ func NewFilteredTerminusInformer(client versioned.Interface, resyncPeriod time.D
 				if tweakListOptions != nil {
 					tweakListOptions(&options)
 				}
-				return client.SysV1alpha1().Terminuses().List(context.Background(), options)
+				return client.SysV1alpha1().Terminus().List(context.Background(), options)
 			},
 			WatchFunc: func(options v1.ListOptions) (watch.Interface, error) {
 				if tweakListOptions != nil {
 					tweakListOptions(&options)
 				}
-				return client.SysV1alpha1().Terminuses().Watch(context.Background(), options)
+				return client.SysV1alpha1().Terminus().Watch(context.Background(), options)
 			},
 			ListWithContextFunc: func(ctx context.Context, options v1.ListOptions) (runtime.Object, error) {
 				if tweakListOptions != nil {
 					tweakListOptions(&options)
 				}
-				return client.SysV1alpha1().Terminuses().List(ctx, options)
+				return client.SysV1alpha1().Terminus().List(ctx, options)
 			},
 			WatchFuncWithContext: func(ctx context.Context, options v1.ListOptions) (watch.Interface, error) {
 				if tweakListOptions != nil {
 					tweakListOptions(&options)
 				}
-				return client.SysV1alpha1().Terminuses().Watch(ctx, options)
+				return client.SysV1alpha1().Terminus().Watch(ctx, options)
 			},
 		},
 		&apisysbytetradeiov1alpha1.Terminus{},

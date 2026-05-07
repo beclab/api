@@ -20,8 +20,8 @@ func (c *FakeSysV1alpha1) SystemEnvs() v1alpha1.SystemEnvInterface {
 	return newFakeSystemEnvs(c)
 }
 
-func (c *FakeSysV1alpha1) Terminuses() v1alpha1.TerminusInterface {
-	return newFakeTerminuses(c)
+func (c *FakeSysV1alpha1) Terminus() v1alpha1.TerminusInterface {
+	return newFakeTerminus(c)
 }
 
 func (c *FakeSysV1alpha1) UserEnvs(namespace string) v1alpha1.UserEnvInterface {

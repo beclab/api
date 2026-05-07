@@ -11,13 +11,13 @@ type AppMetaData struct {
 	Name        string   `yaml:"name" json:"name"`
 	Icon        string   `yaml:"icon" json:"icon"`
 	Description string   `yaml:"description" json:"description"`
-	AppID       string   `yaml:"appid" json:"appid"`
+	AppID       string   `yaml:"appid,omitempty" json:"appid,omitempty"`
 	Title       string   `yaml:"title" json:"title"`
 	Version     string   `yaml:"version" json:"version"`
-	Categories  []string `yaml:"categories" json:"categories"`
-	Rating      float32  `yaml:"rating" json:"rating"`
-	Target      string   `yaml:"target" json:"target"`
-	Type        string   `yaml:"type" json:"type"`
+	Categories  []string `yaml:"categories,omitempty" json:"categories,omitempty"`
+	Rating      float32  `yaml:"rating,omitempty" json:"rating,omitempty"`
+	Target      string   `yaml:"target,omitempty" json:"target,omitempty"`
+	Type        string   `yaml:"type,omitempty" json:"type,omitempty"`
 }
 
 type AppConfiguration struct {
@@ -26,12 +26,12 @@ type AppConfiguration struct {
 	APIVersion    string                  `yaml:"apiVersion" json:"apiVersion"`
 	Metadata      AppMetaData             `yaml:"metadata" json:"metadata"`
 	Entrances     []v1alpha1.Entrance     `yaml:"entrances" json:"entrances"`
-	Ports         []v1alpha1.ServicePort  `yaml:"ports" json:"ports"`
-	TailScale     v1alpha1.TailScale      `yaml:"tailscale" json:"tailscale"`
+	Ports         []v1alpha1.ServicePort  `yaml:"ports,omitempty" json:"ports,omitempty"`
+	TailScale     v1alpha1.TailScale      `yaml:"tailscale,omitempty" json:"tailscale,omitempty"`
 	Spec          AppSpec                 `yaml:"spec" json:"spec"`
-	Permission    Permission              `yaml:"permission" json:"permission" description:"app permission request"`
-	Middleware    *Middleware             `yaml:"middleware" json:"middleware" description:"app middleware request"`
-	Options       Options                 `yaml:"options" json:"options" description:"app options"`
+	Permission    Permission              `yaml:"permission,omitempty" json:"permission,omitempty" description:"app permission request"`
+	Middleware    *Middleware             `yaml:"middleware,omitempty" json:"middleware,omitempty" description:"app middleware request"`
+	Options       Options                 `yaml:"options,omitempty" json:"options,omitempty" description:"app options"`
 	Provider      []Provider              `yaml:"provider,omitempty" json:"provider,omitempty" description:"app provider information"`
 	Envs          []sysv1alpha1.AppEnvVar `yaml:"envs,omitempty" json:"envs,omitempty"`
 
@@ -43,12 +43,12 @@ type AppSpec struct {
 	Namespace           string         `yaml:"namespace,omitempty" json:"namespace,omitempty"`
 	OnlyAdmin           bool           `yaml:"onlyAdmin,omitempty" json:"onlyAdmin,omitempty"`
 	VersionName         string         `yaml:"versionName" json:"versionName"`
-	FullDescription     string         `yaml:"fullDescription" json:"fullDescription"`
-	UpgradeDescription  string         `yaml:"upgradeDescription" json:"upgradeDescription"`
-	PromoteImage        []string       `yaml:"promoteImage" json:"promoteImage"`
-	PromoteVideo        string         `yaml:"promoteVideo" json:"promoteVideo"`
-	SubCategory         string         `yaml:"subCategory" json:"subCategory"`
-	Developer           string         `yaml:"developer" json:"developer"`
+	FullDescription     string         `yaml:"fullDescription,omitempty" json:"fullDescription,omitempty"`
+	UpgradeDescription  string         `yaml:"upgradeDescription,omitempty" json:"upgradeDescription,omitempty"`
+	PromoteImage        []string       `yaml:"promoteImage,omitempty" json:"promoteImage,omitempty"`
+	PromoteVideo        string         `yaml:"promoteVideo,omitempty" json:"promoteVideo,omitempty"`
+	SubCategory         string         `yaml:"subCategory,omitempty" json:"subCategory,omitempty"`
+	Developer           string         `yaml:"developer,omitempty" json:"developer,omitempty"`
 	RequiredMemory      string         `yaml:"requiredMemory" json:"requiredMemory"`
 	RequiredDisk        string         `yaml:"requiredDisk" json:"requiredDisk"`
 	RequiredGPU         string         `yaml:"requiredGpu" json:"requiredGpu"`
@@ -57,75 +57,75 @@ type AppSpec struct {
 	LimitedDisk         string         `yaml:"limitedDisk" json:"limitedDisk"`
 	LimitedGPU          string         `yaml:"limitedGpu" json:"limitedGpu"`
 	LimitedCPU          string         `yaml:"limitedCpu" json:"limitedCpu"`
-	SupportClient       SupportClient  `yaml:"supportClient" json:"supportClient"`
+	SupportClient       SupportClient  `yaml:"supportClient,omitempty" json:"supportClient,omitempty"`
 	RunAsUser           bool           `yaml:"runAsUser" json:"runAsUser"`
 	RunAsInternal       bool           `yaml:"runAsInternal" json:"runAsInternal"`
-	PodGPUConsumePolicy string         `yaml:"podGpuConsumePolicy" json:"podGpuConsumePolicy"`
-	SubCharts           []Chart        `yaml:"subCharts" json:"subCharts"`
-	Hardware            Hardware       `yaml:"hardware" json:"hardware"`
+	PodGPUConsumePolicy string         `yaml:"podGpuConsumePolicy,omitempty" json:"podGpuConsumePolicy,omitempty"`
+	SubCharts           []Chart        `yaml:"subCharts,omitempty" json:"subCharts,omitempty"`
+	Hardware            Hardware       `yaml:"hardware,omitempty" json:"hardware,omitempty"`
 	SupportedGpu        []any          `yaml:"supportedGpu,omitempty" json:"supportedGpu,omitempty"`
 	Resources           []ResourceMode `yaml:"resources,omitempty" json:"resources,omitempty"`
 	SupportArch         []string       `yaml:"supportArch,omitempty" json:"supportArch,omitempty"`
 	Website             string         `yaml:"website,omitempty" json:"website,omitempty"`
 	SourceCode          string         `yaml:"sourceCode,omitempty" json:"sourceCode,omitempty"`
-	Submitter           string         `yaml:"submitter" json:"submitter"`
-	Locale              []string       `yaml:"locale" json:"locale"`
-	Doc                 string         `yaml:"doc" json:"doc"`
+	Submitter           string         `yaml:"submitter,omitempty" json:"submitter,omitempty"`
+	Locale              []string       `yaml:"locale,omitempty" json:"locale,omitempty"`
+	Doc                 string         `yaml:"doc,omitempty" json:"doc,omitempty"`
 	License             []struct {
-		Text string `yaml:"text" json:"text"`
-		URL  string `yaml:"url" json:"url"`
-	} `yaml:"license" json:"license"`
+		Text string `yaml:"text,omitempty" json:"text,omitempty"`
+		URL  string `yaml:"url,omitempty" json:"url,omitempty"`
+	} `yaml:"license,omitempty" json:"license,omitempty"`
 }
 
 type Hardware struct {
-	Cpu CpuConfig `yaml:"cpu" json:"cpu"`
-	Gpu GpuConfig `yaml:"gpu" json:"gpu"`
+	Cpu CpuConfig `yaml:"cpu,omitempty" json:"cpu,omitempty"`
+	Gpu GpuConfig `yaml:"gpu,omitempty" json:"gpu,omitempty"`
 }
 
 type CpuConfig struct {
-	Vendor string `yaml:"vendor" json:"vendor"`
-	Arch   string `yaml:"arch" json:"arch"`
+	Vendor string `yaml:"vendor,omitempty" json:"vendor,omitempty"`
+	Arch   string `yaml:"arch,omitempty" json:"arch,omitempty"`
 }
 type GpuConfig struct {
-	Vendor string   `yaml:"vendor" json:"vendor"`
-	Arch   []string `yaml:"arch" json:"arch"`
+	Vendor string   `yaml:"vendor,omitempty" json:"vendor,omitempty"`
+	Arch   []string `yaml:"arch,omitempty" json:"arch,omitempty"`
 	// SingleMemory specifies the minimum memory size required for a single GPU
-	SingleMemory string `yaml:"singleMemory" json:"singleMemory"`
+	SingleMemory string `yaml:"singleMemory,omitempty" json:"singleMemory,omitempty"`
 	// TotalMemory specifies the total GPU memory required across all GPUs within one node
-	TotalMemory string `yaml:"totalMemory" json:"totalMemory"`
+	TotalMemory string `yaml:"totalMemory,omitempty" json:"totalMemory,omitempty"`
 }
 
 type SupportClient struct {
-	Edge    string `yaml:"edge" json:"edge"`
-	Android string `yaml:"android" json:"android"`
-	Ios     string `yaml:"ios" json:"ios"`
-	Windows string `yaml:"windows" json:"windows"`
-	Mac     string `yaml:"mac" json:"mac"`
-	Linux   string `yaml:"linux" json:"linux"`
+	Edge    string `yaml:"edge,omitempty" json:"edge,omitempty"`
+	Android string `yaml:"android,omitempty" json:"android,omitempty"`
+	Ios     string `yaml:"ios,omitempty" json:"ios,omitempty"`
+	Windows string `yaml:"windows,omitempty" json:"windows,omitempty"`
+	Mac     string `yaml:"mac,omitempty" json:"mac,omitempty"`
+	Linux   string `yaml:"linux,omitempty" json:"linux,omitempty"`
 }
 
 type Permission struct {
-	AppData        bool                 `yaml:"appData" json:"appData"  description:"app data permission for writing"`
-	AppCache       bool                 `yaml:"appCache" json:"appCache"`
-	UserData       []string             `yaml:"userData" json:"userData"`
-	Provider       []ProviderPermission `yaml:"provider" json:"provider"  description:"system shared data permission for accessing"`
+	AppData        bool                 `yaml:"appData,omitempty" json:"appData,omitempty"  description:"app data permission for writing"`
+	AppCache       bool                 `yaml:"appCache,omitempty" json:"appCache,omitempty"`
+	UserData       []string             `yaml:"userData,omitempty" json:"userData,omitempty"`
+	Provider       []ProviderPermission `yaml:"provider,omitempty" json:"provider,omitempty"  description:"system shared data permission for accessing"`
 	ServiceAccount *string              `yaml:"serviceAccount,omitempty" json:"serviceAccount,omitempty" description:"service account for app permission"`
 }
 
 type ProviderPermission struct {
-	AppName      string                 `yaml:"appName" json:"appName"`
+	AppName      string                 `yaml:"appName,omitempty" json:"appName,omitempty"`
 	Namespace    string                 `yaml:"namespace,omitempty" json:"namespace,omitempty"`
-	ProviderName string                 `yaml:"providerName" json:"providerName"`
-	PodSelectors []metav1.LabelSelector `yaml:"podSelectors" json:"podSelectors"`
+	ProviderName string                 `yaml:"providerName,omitempty" json:"providerName,omitempty"`
+	PodSelectors []metav1.LabelSelector `yaml:"podSelectors,omitempty" json:"podSelectors,omitempty"`
 }
 
 type Policy struct {
-	EntranceName string `yaml:"entranceName" json:"entranceName"`
-	Description  string `yaml:"description" json:"description" description:"the description of the policy"`
-	URIRegex     string `yaml:"uriRegex" json:"uriRegex" description:"uri regular expression"`
-	Level        string `yaml:"level" json:"level"`
+	EntranceName string `yaml:"entranceName,omitempty" json:"entranceName,omitempty"`
+	Description  string `yaml:"description,omitempty" json:"description,omitempty" description:"the description of the policy"`
+	URIRegex     string `yaml:"uriRegex,omitempty" json:"uriRegex,omitempty" description:"uri regular expression"`
+	Level        string `yaml:"level,omitempty" json:"level,omitempty"`
 	OneTime      bool   `yaml:"oneTime" json:"oneTime"`
-	Duration     string `yaml:"validDuration" json:"validDuration"`
+	Duration     string `yaml:"validDuration,omitempty" json:"validDuration,omitempty"`
 }
 
 type Dependency struct {
@@ -144,59 +144,59 @@ type Conflict struct {
 }
 
 type Options struct {
-	MobileSupported      bool                     `yaml:"mobileSupported" json:"mobileSupported"`
-	Policies             []Policy                 `yaml:"policies" json:"policies"`
-	ResetCookie          ResetCookie              `yaml:"resetCookie" json:"resetCookie"`
-	Dependencies         []Dependency             `yaml:"dependencies" json:"dependencies"`
-	Conflicts            []Conflict               `yaml:"conflicts" json:"conflicts"`
-	AppScope             AppScope                 `yaml:"appScope" json:"appScope"`
-	WsConfig             WsConfig                 `yaml:"websocket" json:"websocket"`
-	Upload               Upload                   `yaml:"upload" json:"upload"`
-	SyncProvider         []map[string]interface{} `yaml:"syncProvider" json:"syncProvider"`
-	OIDC                 OIDC                     `yaml:"oidc" json:"oidc"`
-	ApiTimeout           *int64                   `yaml:"apiTimeout" json:"apiTimeout"`
-	AllowedOutboundPorts []int                    `yaml:"allowedOutboundPorts" json:"AllowedOutboundPorts"`
-	Images               []string                 `yaml:"images" json:"images"`
-	AllowMultipleInstall bool                     `yaml:"allowMultipleInstall" json:"allowMultipleInstall"`
+	MobileSupported      bool                     `yaml:"mobileSupported,omitempty" json:"mobileSupported,omitempty"`
+	Policies             []Policy                 `yaml:"policies,omitempty" json:"policies,omitempty"`
+	ResetCookie          ResetCookie              `yaml:"resetCookie,omitempty" json:"resetCookie,omitempty"`
+	Dependencies         []Dependency             `yaml:"dependencies,omitempty" json:"dependencies,omitempty"`
+	Conflicts            []Conflict               `yaml:"conflicts,omitempty" json:"conflicts,omitempty"`
+	AppScope             AppScope                 `yaml:"appScope,omitempty" json:"appScope,omitempty"`
+	WsConfig             WsConfig                 `yaml:"websocket,omitempty" json:"websocket,omitempty"`
+	Upload               Upload                   `yaml:"upload,omitempty" json:"upload,omitempty"`
+	SyncProvider         []map[string]interface{} `yaml:"syncProvider,omitempty" json:"syncProvider,omitempty"`
+	OIDC                 OIDC                     `yaml:"oidc,omitempty" json:"oidc,omitempty"`
+	ApiTimeout           *int64                   `yaml:"apiTimeout,omitempty" json:"apiTimeout,omitempty"`
+	AllowedOutboundPorts []int                    `yaml:"allowedOutboundPorts,omitempty" json:"AllowedOutboundPorts,omitempty"`
+	Images               []string                 `yaml:"images,omitempty" json:"images,omitempty"`
+	AllowMultipleInstall bool                     `yaml:"allowMultipleInstall,omitempty" json:"allowMultipleInstall,omitempty"`
 }
 
 type ResetCookie struct {
-	Enabled bool `yaml:"enabled" json:"enabled"`
+	Enabled bool `yaml:"enabled,omitempty" json:"enabled,omitempty"`
 }
 
 type AppScope struct {
-	ClusterScoped bool     `yaml:"clusterScoped" json:"clusterScoped"`
-	AppRef        []string `yaml:"appRef" json:"appRef"`
-	SystemService bool     `yaml:"systemService" json:"systemService"`
+	ClusterScoped bool     `yaml:"clusterScoped,omitempty" json:"clusterScoped,omitempty"`
+	AppRef        []string `yaml:"appRef,omitempty" json:"appRef,omitempty"`
+	SystemService bool     `yaml:"systemService,omitempty" json:"systemService,omitempty"`
 }
 
 type WsConfig struct {
-	Port int    `yaml:"port" json:"port"`
-	URL  string `yaml:"url" json:"url"`
+	Port int    `yaml:"port,omitempty" json:"port,omitempty"`
+	URL  string `yaml:"url,omitempty" json:"url,omitempty"`
 }
 
 type Upload struct {
-	FileType    []string `yaml:"fileType" json:"fileType"`
-	Dest        string   `yaml:"dest" json:"dest"`
-	LimitedSize int      `yaml:"limitedSize" json:"limitedSize"`
+	FileType    []string `yaml:"fileType,omitempty" json:"fileType,omitempty"`
+	Dest        string   `yaml:"dest,omitempty" json:"dest,omitempty"`
+	LimitedSize int      `yaml:"limitedSize,omitempty" json:"limitedSize,omitempty"`
 }
 
 type OIDC struct {
-	Enabled      bool   `yaml:"enabled" json:"enabled"`
-	RedirectUri  string `yaml:"redirectUri" json:"redirectUri"`
-	EntranceName string `yaml:"entranceName" json:"entranceName"`
+	Enabled      bool   `yaml:"enabled,omitempty" json:"enabled,omitempty"`
+	RedirectUri  string `yaml:"redirectUri,omitempty" json:"redirectUri,omitempty"`
+	EntranceName string `yaml:"entranceName,omitempty" json:"entranceName,omitempty"`
 }
 
 type Chart struct {
-	Name   string `yaml:"name" json:"name"`
-	Shared bool   `yaml:"shared" json:"shared"`
+	Name   string `yaml:"name,omitempty" json:"name,omitempty"`
+	Shared bool   `yaml:"shared,omitempty" json:"shared,omitempty"`
 }
 
 type Provider struct {
-	Name     string   `yaml:"name" json:"name"`
-	Entrance string   `yaml:"entrance" json:"entrance"`
-	Paths    []string `yaml:"paths" json:"paths"`
-	Verbs    []string `yaml:"verbs" json:"verbs"`
+	Name     string   `yaml:"name,omitempty" json:"name,omitempty"`
+	Entrance string   `yaml:"entrance,omitempty" json:"entrance,omitempty"`
+	Paths    []string `yaml:"paths,omitempty" json:"paths,omitempty"`
+	Verbs    []string `yaml:"verbs,omitempty" json:"verbs,omitempty"`
 }
 
 type SpecialResource struct {

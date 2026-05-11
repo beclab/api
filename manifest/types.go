@@ -159,6 +159,7 @@ type Options struct {
 	AllowedOutboundPorts []int                    `yaml:"allowedOutboundPorts,omitempty" json:"AllowedOutboundPorts,omitempty"`
 	Images               []string                 `yaml:"images,omitempty" json:"images,omitempty"`
 	AllowMultipleInstall bool                     `yaml:"allowMultipleInstall,omitempty" json:"allowMultipleInstall,omitempty"`
+	NeedsSharedAccess    bool                     `yaml:"needsSharedAccess,omitempty" json:"needsSharedAccess,omitempty"`
 }
 
 type ResetCookie struct {

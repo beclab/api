@@ -2,6 +2,8 @@
 
 package v1alpha1
 
+type AppAccessGrantExpansion interface{}
+
 type AppImageExpansion interface{}
 
 type ApplicationExpansion interface{}

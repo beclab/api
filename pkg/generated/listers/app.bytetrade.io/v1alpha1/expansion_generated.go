@@ -2,6 +2,10 @@
 
 package v1alpha1
 
+// AppAccessGrantListerExpansion allows custom methods to be added to
+// AppAccessGrantLister.
+type AppAccessGrantListerExpansion interface{}
+
 // AppImageListerExpansion allows custom methods to be added to
 // AppImageLister.
 type AppImageListerExpansion interface{}

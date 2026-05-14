@@ -56,18 +56,20 @@ type ApplicationSpec struct {
 
 	// the extend settings of the application
 	Settings map[string]string `json:"settings,omitempty"`
+
+	UserSettings map[string]map[string]string `json:"userSettings,omitempty"`
 }
 
 type ACL struct {
-	Action string   `json:"action,omitempty"`
-	Src    []string `json:"src,omitempty"`
-	Proto  string   `json:"proto"`
-	Dst    []string `json:"dst"`
+	Action string   `json:"action,omitempty" yaml:"action,omitempty"`
+	Src    []string `json:"src,omitempty" yaml:"src,omitempty"`
+	Proto  string   `json:"proto" yaml:"proto"`
+	Dst    []string `json:"dst" yaml:"dst"`
 }
 
 type TailScale struct {
-	ACLs      []ACL    `json:"acls,omitempty"`
-	SubRoutes []string `json:"subRoutes,omitempty"`
+	ACLs      []ACL    `json:"acls,omitempty" yaml:"acls"`
+	SubRoutes []string `json:"subRoutes,omitempty" yaml:"subRoutes"`
 }
 
 type EntranceState string

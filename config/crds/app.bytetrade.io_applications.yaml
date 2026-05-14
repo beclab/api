@@ -246,6 +246,12 @@ spec:
                   - proto
                   type: object
                 type: array
+              userSettings:
+                additionalProperties:
+                  additionalProperties:
+                    type: string
+                  type: object
+                type: object
             required:
             - appid
             - isSysApp

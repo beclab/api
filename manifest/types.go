@@ -156,7 +156,7 @@ type Options struct {
 	SyncProvider         []map[string]interface{} `yaml:"syncProvider,omitempty" json:"syncProvider,omitempty"`
 	OIDC                 OIDC                     `yaml:"oidc,omitempty" json:"oidc,omitempty"`
 	ApiTimeout           *int64                   `yaml:"apiTimeout,omitempty" json:"apiTimeout,omitempty"`
-	AllowedOutboundPorts []int                    `yaml:"allowedOutboundPorts,omitempty" json:"AllowedOutboundPorts,omitempty"`
+	AllowedOutboundPorts []int                    `yaml:"allowedOutboundPorts,omitempty" json:"allowedOutboundPorts,omitempty"`
 	Images               []string                 `yaml:"images,omitempty" json:"images,omitempty"`
 	AllowMultipleInstall bool                     `yaml:"allowMultipleInstall,omitempty" json:"allowMultipleInstall,omitempty"`
 	NeedsSharedAccess    bool                     `yaml:"needsSharedAccess,omitempty" json:"needsSharedAccess,omitempty"`

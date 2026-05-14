@@ -56,6 +56,8 @@ type ApplicationSpec struct {
 
 	// the extend settings of the application
 	Settings map[string]string `json:"settings,omitempty"`
+
+	UserSettings map[string]map[string]string `json:"userSettings,omitempty"`
 }
 
 type ACL struct {

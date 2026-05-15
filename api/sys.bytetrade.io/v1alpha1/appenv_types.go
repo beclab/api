@@ -30,8 +30,8 @@ type AppEnvVar struct {
 
 // ValueFrom defines a reference to an environment variable (UserEnv or SystemEnv)
 type ValueFrom struct {
-	EnvName string `json:"envName" validate:"required"`
-	Status  string `json:"status,omitempty"`
+	EnvName string `json:"envName" yaml:"envName" validate:"required"`
+	Status  string `json:"status,omitempty" yaml:"status,omitempty"`
 }
 
 type EnvValueOptionItem struct {

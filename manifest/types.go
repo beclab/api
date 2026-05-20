@@ -145,21 +145,22 @@ type Conflict struct {
 }
 
 type Options struct {
-	MobileSupported      bool                     `yaml:"mobileSupported,omitempty" json:"mobileSupported,omitempty"`
-	Policies             []Policy                 `yaml:"policies,omitempty" json:"policies,omitempty"`
-	ResetCookie          ResetCookie              `yaml:"resetCookie,omitempty" json:"resetCookie,omitempty"`
-	Dependencies         []Dependency             `yaml:"dependencies,omitempty" json:"dependencies,omitempty"`
-	Conflicts            []Conflict               `yaml:"conflicts,omitempty" json:"conflicts,omitempty"`
-	AppScope             AppScope                 `yaml:"appScope,omitempty" json:"appScope,omitempty"`
-	WsConfig             WsConfig                 `yaml:"websocket,omitempty" json:"websocket,omitempty"`
-	Upload               Upload                   `yaml:"upload,omitempty" json:"upload,omitempty"`
-	SyncProvider         []map[string]interface{} `yaml:"syncProvider,omitempty" json:"syncProvider,omitempty"`
-	OIDC                 OIDC                     `yaml:"oidc,omitempty" json:"oidc,omitempty"`
-	ApiTimeout           *int64                   `yaml:"apiTimeout,omitempty" json:"apiTimeout,omitempty"`
-	AllowedOutboundPorts []int                    `yaml:"allowedOutboundPorts,omitempty" json:"allowedOutboundPorts,omitempty"`
-	Images               []string                 `yaml:"images,omitempty" json:"images,omitempty"`
-	AllowMultipleInstall bool                     `yaml:"allowMultipleInstall,omitempty" json:"allowMultipleInstall,omitempty"`
-	NeedsSharedAccess    bool                     `yaml:"needsSharedAccess,omitempty" json:"needsSharedAccess,omitempty"`
+	MobileSupported         bool                     `yaml:"mobileSupported,omitempty" json:"mobileSupported,omitempty"`
+	Policies                []Policy                 `yaml:"policies,omitempty" json:"policies,omitempty"`
+	ResetCookie             ResetCookie              `yaml:"resetCookie,omitempty" json:"resetCookie,omitempty"`
+	Dependencies            []Dependency             `yaml:"dependencies,omitempty" json:"dependencies,omitempty"`
+	Conflicts               []Conflict               `yaml:"conflicts,omitempty" json:"conflicts,omitempty"`
+	AppScope                AppScope                 `yaml:"appScope,omitempty" json:"appScope,omitempty"`
+	WsConfig                WsConfig                 `yaml:"websocket,omitempty" json:"websocket,omitempty"`
+	Upload                  Upload                   `yaml:"upload,omitempty" json:"upload,omitempty"`
+	SyncProvider            []map[string]interface{} `yaml:"syncProvider,omitempty" json:"syncProvider,omitempty"`
+	OIDC                    OIDC                     `yaml:"oidc,omitempty" json:"oidc,omitempty"`
+	ApiTimeout              *int64                   `yaml:"apiTimeout,omitempty" json:"apiTimeout,omitempty"`
+	AllowedOutboundPorts    []int                    `yaml:"allowedOutboundPorts,omitempty" json:"allowedOutboundPorts,omitempty"`
+	Images                  []string                 `yaml:"images,omitempty" json:"images,omitempty"`
+	AllowMultipleInstall    bool                     `yaml:"allowMultipleInstall,omitempty" json:"allowMultipleInstall,omitempty"`
+	NeedsSharedAccess       bool                     `yaml:"needsSharedAccess,omitempty" json:"needsSharedAccess,omitempty"`
+	OverlayGatewaySupported bool                     `yaml:"overlayGatewaySupported,omitempty" json:"overlayGatewaySupported,omitempty"`
 }
 
 type ResetCookie struct {

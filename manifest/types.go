@@ -40,38 +40,38 @@ type AppConfiguration struct {
 }
 
 type AppSpec struct {
-	Namespace           string         `yaml:"namespace,omitempty" json:"namespace,omitempty"`
-	OnlyAdmin           bool           `yaml:"onlyAdmin,omitempty" json:"onlyAdmin,omitempty"`
-	VersionName         string         `yaml:"versionName" json:"versionName"`
-	FullDescription     string         `yaml:"fullDescription,omitempty" json:"fullDescription,omitempty"`
-	UpgradeDescription  string         `yaml:"upgradeDescription,omitempty" json:"upgradeDescription,omitempty"`
-	PromoteImage        []string       `yaml:"promoteImage,omitempty" json:"promoteImage,omitempty"`
-	PromoteVideo        string         `yaml:"promoteVideo,omitempty" json:"promoteVideo,omitempty"`
-	SubCategory         string         `yaml:"subCategory,omitempty" json:"subCategory,omitempty"`
-	Developer           string         `yaml:"developer,omitempty" json:"developer,omitempty"`
-	RequiredMemory      string         `yaml:"requiredMemory,omitempty" json:"requiredMemory,omitempty"`
-	RequiredDisk        string         `yaml:"requiredDisk,omitempty" json:"requiredDisk,omitempty"`
-	RequiredGPU         string         `yaml:"requiredGpu,omitempty" json:"requiredGpu,omitempty"`
-	RequiredCPU         string         `yaml:"requiredCpu,omitempty" json:"requiredCpu,omitempty"`
-	LimitedMemory       string         `yaml:"limitedMemory,omitempty" json:"limitedMemory,omitempty"`
-	LimitedDisk         string         `yaml:"limitedDisk,omitempty" json:"limitedDisk,omitempty"`
-	LimitedGPU          string         `yaml:"limitedGpu,omitempty" json:"limitedGpu,omitempty"`
-	LimitedCPU          string         `yaml:"limitedCpu,omitempty" json:"limitedCpu,omitempty"`
-	SupportClient       SupportClient  `yaml:"supportClient,omitempty" json:"supportClient,omitempty"`
-	RunAsUser           bool           `yaml:"runAsUser" json:"runAsUser"`
-	RunAsInternal       bool           `yaml:"runAsInternal" json:"runAsInternal"`
-	PodGPUConsumePolicy string         `yaml:"podGpuConsumePolicy,omitempty" json:"podGpuConsumePolicy,omitempty"`
-	SubCharts           []Chart        `yaml:"subCharts,omitempty" json:"subCharts,omitempty"`
-	Hardware            Hardware       `yaml:"hardware,omitempty" json:"hardware,omitempty"`
-	SupportedGpu        []any          `yaml:"supportedGpu,omitempty" json:"supportedGpu,omitempty"`
-	Resources           []ResourceMode `yaml:"resources,omitempty" json:"resources,omitempty"`
-	SupportArch         []string       `yaml:"supportArch,omitempty" json:"supportArch,omitempty"`
-	Website             string         `yaml:"website,omitempty" json:"website,omitempty"`
-	SourceCode          string         `yaml:"sourceCode,omitempty" json:"sourceCode,omitempty"`
-	Submitter           string         `yaml:"submitter,omitempty" json:"submitter,omitempty"`
-	Locale              []string       `yaml:"locale,omitempty" json:"locale,omitempty"`
-	Doc                 string         `yaml:"doc,omitempty" json:"doc,omitempty"`
-	License             []struct {
+	Namespace            string         `yaml:"namespace,omitempty" json:"namespace,omitempty"`
+	OnlyAdmin            bool           `yaml:"onlyAdmin,omitempty" json:"onlyAdmin,omitempty"`
+	VersionName          string         `yaml:"versionName" json:"versionName"`
+	FullDescription      string         `yaml:"fullDescription,omitempty" json:"fullDescription,omitempty"`
+	UpgradeDescription   string         `yaml:"upgradeDescription,omitempty" json:"upgradeDescription,omitempty"`
+	PromoteImage         []string       `yaml:"promoteImage,omitempty" json:"promoteImage,omitempty"`
+	PromoteVideo         string         `yaml:"promoteVideo,omitempty" json:"promoteVideo,omitempty"`
+	SubCategory          string         `yaml:"subCategory,omitempty" json:"subCategory,omitempty"`
+	Developer            string         `yaml:"developer,omitempty" json:"developer,omitempty"`
+	RequiredMemory       string         `yaml:"requiredMemory,omitempty" json:"requiredMemory,omitempty"`
+	RequiredDisk         string         `yaml:"requiredDisk,omitempty" json:"requiredDisk,omitempty"`
+	RequiredGPU          string         `yaml:"requiredGpu,omitempty" json:"requiredGpu,omitempty"`
+	RequiredCPU          string         `yaml:"requiredCpu,omitempty" json:"requiredCpu,omitempty"`
+	LimitedMemory        string         `yaml:"limitedMemory,omitempty" json:"limitedMemory,omitempty"`
+	LimitedDisk          string         `yaml:"limitedDisk,omitempty" json:"limitedDisk,omitempty"`
+	LimitedGPU           string         `yaml:"limitedGpu,omitempty" json:"limitedGpu,omitempty"`
+	LimitedCPU           string         `yaml:"limitedCpu,omitempty" json:"limitedCpu,omitempty"`
+	SupportClient        SupportClient  `yaml:"supportClient,omitempty" json:"supportClient,omitempty"`
+	RunAsUser            bool           `yaml:"runAsUser" json:"runAsUser"`
+	RunAsInternal        bool           `yaml:"runAsInternal" json:"runAsInternal"`
+	PodGPUConsumePolicy  string         `yaml:"podGpuConsumePolicy,omitempty" json:"podGpuConsumePolicy,omitempty"`
+	SubCharts            []Chart        `yaml:"subCharts,omitempty" json:"subCharts,omitempty"`
+	Hardware             Hardware       `yaml:"hardware,omitempty" json:"hardware,omitempty"`
+	SupportedGpu         []any          `yaml:"supportedGpu,omitempty" json:"supportedGpu,omitempty"`
+	AcceleratedResources []ResourceMode `yaml:"acceleratedResources,omitempty" json:"acceleratedResources,omitempty"`
+	SupportArch          []string       `yaml:"supportArch,omitempty" json:"supportArch,omitempty"`
+	Website              string         `yaml:"website,omitempty" json:"website,omitempty"`
+	SourceCode           string         `yaml:"sourceCode,omitempty" json:"sourceCode,omitempty"`
+	Submitter            string         `yaml:"submitter,omitempty" json:"submitter,omitempty"`
+	Locale               []string       `yaml:"locale,omitempty" json:"locale,omitempty"`
+	Doc                  string         `yaml:"doc,omitempty" json:"doc,omitempty"`
+	License              []struct {
 		Text string `yaml:"text,omitempty" json:"text,omitempty"`
 		URL  string `yaml:"url,omitempty" json:"url,omitempty"`
 	} `yaml:"license,omitempty" json:"license,omitempty"`
@@ -161,6 +161,7 @@ type Options struct {
 	AllowMultipleInstall    bool                     `yaml:"allowMultipleInstall,omitempty" json:"allowMultipleInstall,omitempty"`
 	NeedsSharedAccess       bool                     `yaml:"needsSharedAccess,omitempty" json:"needsSharedAccess,omitempty"`
 	OverlayGatewaySupported bool                     `yaml:"overlayGatewaySupported,omitempty" json:"overlayGatewaySupported,omitempty"`
+	LLMGatewaySupported     bool                     `yaml:"LLMGatewaySupported,omitempty" json:"LLMGatewaySupported,omitempty"`
 }
 
 type ResetCookie struct {

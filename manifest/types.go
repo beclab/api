@@ -64,7 +64,7 @@ type AppSpec struct {
 	SubCharts           []Chart        `yaml:"subCharts,omitempty" json:"subCharts,omitempty"`
 	Hardware            Hardware       `yaml:"hardware,omitempty" json:"hardware,omitempty"`
 	SupportedGpu        []any          `yaml:"supportedGpu,omitempty" json:"supportedGpu,omitempty"`
-	Resources           []ResourceMode `yaml:"resources,omitempty" json:"resources,omitempty"`
+	Accelerator         []ResourceMode `yaml:"accelerator,omitempty" json:"accelerator,omitempty"`
 	SupportArch         []string       `yaml:"supportArch,omitempty" json:"supportArch,omitempty"`
 	Website             string         `yaml:"website,omitempty" json:"website,omitempty"`
 	SourceCode          string         `yaml:"sourceCode,omitempty" json:"sourceCode,omitempty"`
@@ -161,6 +161,7 @@ type Options struct {
 	AllowMultipleInstall    bool                     `yaml:"allowMultipleInstall,omitempty" json:"allowMultipleInstall,omitempty"`
 	NeedsSharedAccess       bool                     `yaml:"needsSharedAccess,omitempty" json:"needsSharedAccess,omitempty"`
 	OverlayGatewaySupported bool                     `yaml:"overlayGatewaySupported,omitempty" json:"overlayGatewaySupported,omitempty"`
+	LLMGatewaySupported     bool                     `yaml:"LLMGatewaySupported,omitempty" json:"LLMGatewaySupported,omitempty"`
 }
 
 type ResetCookie struct {

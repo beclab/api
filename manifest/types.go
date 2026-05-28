@@ -36,8 +36,9 @@ type AppConfiguration struct {
 	Envs          []sysv1alpha1.AppEnvVar `yaml:"envs,omitempty" json:"envs,omitempty"`
 
 	// Only for v2 c/s apps to share the api to other cluster scope apps
-	SharedEntrances []v1alpha1.Entrance `yaml:"sharedEntrances,omitempty" json:"sharedEntrances,omitempty"`
-	OverlayGateway  OverlayGateway      `yaml:"overlayGateway,omitempty" json:"overlayGateway,omitempty"`
+	SharedEntrances  []v1alpha1.Entrance `yaml:"sharedEntrances,omitempty" json:"sharedEntrances,omitempty"`
+	OverlayGateway   OverlayGateway      `yaml:"overlayGateway,omitempty" json:"overlayGateway,omitempty"`
+	WorkloadReplicas map[string]int32    `yaml:"workloadReplicas,omitempty" json:"workloadReplicas,omitempty"`
 }
 
 type OverlayGateway struct {
@@ -48,6 +49,7 @@ type OverlayGateway struct {
 type OverlayEntrance struct {
 	Title       string `yaml:"title" json:"title"`
 	Port        int32  `yaml:"port" json:"port"`
+	Workload    string `yaml:"workload" json:"workload"`
 	Description string `yaml:"description" json:"description"`
 	Protocol    string `yaml:"protocol" json:"protocol"`
 }

@@ -38,8 +38,10 @@ type AppConfiguration struct {
 	// Only for v2 c/s apps to share the api to other cluster scope apps
 	SharedEntrances  []v1alpha1.Entrance `yaml:"sharedEntrances,omitempty" json:"sharedEntrances,omitempty"`
 	OverlayGateway   OverlayGateway      `yaml:"overlayGateway,omitempty" json:"overlayGateway,omitempty"`
-	WorkloadReplicas map[string]int32    `yaml:"workloadReplicas,omitempty" json:"workloadReplicas,omitempty"`
+	WorkloadReplicas *WorkloadReplicas   `yaml:"workloadReplicas,omitempty" json:"workloadReplicas,omitempty"`
 }
+
+type WorkloadReplicas map[string]int32
 
 type OverlayGateway struct {
 	Enable    bool              `yaml:"enable" json:"enable"`

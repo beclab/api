@@ -17,7 +17,18 @@ type EnvVarSpec struct {
 	// RemoteOptions provides a URL (http/https) returning a JSON-encoded string array of allowed values
 	RemoteOptions string `json:"remoteOptions,omitempty" yaml:"remoteOptions,omitempty"`
 	Regex         string `json:"regex,omitempty" yaml:"regex,omitempty"`
+	// MultiSelect indicates the value may hold multiple items joined by Splitter.
+	// When true, the value is split on Splitter and each item is validated
+	// independently against Type/Options/RemoteOptions/Regex.
+	MultiSelect bool `json:"multiSelect,omitempty" yaml:"multiSelect,omitempty"`
+	// Splitter is the delimiter used to join/split multiple values when
+	// MultiSelect is true. Defaults to "," (DefaultEnvSplitter) when empty.
+	Splitter string `json:"splitter,omitempty" yaml:"splitter,omitempty"`
 }
+
+// DefaultEnvSplitter is the delimiter used to join/split multi-select env
+// values when Splitter is not explicitly set.
+const DefaultEnvSplitter = ","
 
 // GetEffectiveValue returns the effective value of the environment variable.
 // If Value is not empty, it returns Value; otherwise, it returns Default.
@@ -26,4 +37,13 @@ func (e *EnvVarSpec) GetEffectiveValue() string {
 		return e.Value
 	}
 	return e.Default
+}
+
+// GetSplitter returns the delimiter used to join/split multiple values for a
+// multi-select env var, defaulting to DefaultEnvSplitter when unset.
+func (e *EnvVarSpec) GetSplitter() string {
+	if e.Splitter != "" {
+		return e.Splitter
+	}
+	return DefaultEnvSplitter
 }

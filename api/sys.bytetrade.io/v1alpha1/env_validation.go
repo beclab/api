@@ -19,16 +19,50 @@ func (e *EnvVarSpec) ValidateValue(value string) error {
 	if value == "" {
 		return nil
 	}
-	if err := e.validateType(value); err != nil {
-		return err
+
+	// Memoize the remote options fetch so a multi-select value with N items
+	// triggers at most one HTTP request instead of one per item.
+	var (
+		remoteFetched bool
+		remoteOptions []EnvValueOptionItem
+		remoteErr     error
+	)
+	getRemote := func() ([]EnvValueOptionItem, error) {
+		if !remoteFetched {
+			remoteOptions, remoteErr = fetchRemoteOptions(e.RemoteOptions)
+			remoteFetched = true
+		}
+		return remoteOptions, remoteErr
 	}
-	if err := e.validateOptions(value); err != nil {
-		return err
-	}
-	if err := e.validateRegex(value); err != nil {
-		return err
+
+	for _, v := range e.splitValues(value) {
+		// Skip empty items so trailing/duplicate splitters (e.g. "a,,b" or
+		// "a,") don't fail validation.
+		if v == "" {
+			continue
+		}
+		if err := e.validateType(v); err != nil {
+			return err
+		}
+		if err := e.validateOptions(v, getRemote); err != nil {
+			return err
+		}
+		if err := e.validateRegex(v); err != nil {
+			return err
+		}
 	}
 	return nil
+}
+
+// splitValues returns the individual values to validate. For a regular env var
+// this is just [value]; for a multi-select env var the value is split on
+// Splitter so each selected item can be validated against the same
+// Type/Options/RemoteOptions/Regex constraints.
+func (e *EnvVarSpec) splitValues(value string) []string {
+	if !e.MultiSelect {
+		return []string{value}
+	}
+	return strings.Split(value, e.GetSplitter())
 }
 
 func (e *EnvVarSpec) validateType(value string) error {
@@ -69,12 +103,14 @@ func (e *EnvVarSpec) validateType(value string) error {
 }
 
 // validateOptions validates the given value against Options and/or RemoteOptions.
+// getRemote lazily resolves (and caches) the remote option list so it is only
+// fetched when a value cannot be satisfied by the local Options.
 // Rules:
 // - If both Options and RemoteOptions are set, value is valid if it is in either set.
 // - If only Options is set, value must be in Options.
 // - If only RemoteOptions is set, value must be in the fetched remote list.
 // - If neither is set, any value is accepted.
-func (e *EnvVarSpec) validateOptions(value string) error {
+func (e *EnvVarSpec) validateOptions(value string, getRemote func() ([]EnvValueOptionItem, error)) error {
 	if value == "" {
 		return nil
 	}
@@ -85,35 +121,26 @@ func (e *EnvVarSpec) validateOptions(value string) error {
 		return nil
 	}
 
-	if hasOptions && hasRemote {
-		if optionsContainValue(e.Options, value) {
-			return nil
-		}
-		allowed, err := fetchRemoteOptions(e.RemoteOptions)
-		if err != nil {
-			return fmt.Errorf("invalid remoteOptions: %w", err)
-		}
-		if !optionsContainValue(allowed, value) {
-			return fmt.Errorf("value not allowed by options or remoteOptions")
-		}
+	// Local options short-circuit, so we avoid a remote fetch when possible.
+	if hasOptions && optionsContainValue(e.Options, value) {
 		return nil
 	}
 
-	if hasOptions {
-		if !optionsContainValue(e.Options, value) {
-			return fmt.Errorf("value not in options")
-		}
-		return nil
+	if !hasRemote {
+		return fmt.Errorf("value not in options")
 	}
 
-	allowed, err := fetchRemoteOptions(e.RemoteOptions)
+	allowed, err := getRemote()
 	if err != nil {
 		return fmt.Errorf("invalid remoteOptions: %w", err)
 	}
-	if !optionsContainValue(allowed, value) {
-		return fmt.Errorf("value not in remoteOptions")
+	if optionsContainValue(allowed, value) {
+		return nil
 	}
-	return nil
+	if hasOptions {
+		return fmt.Errorf("value not allowed by options or remoteOptions")
+	}
+	return fmt.Errorf("value not in remoteOptions")
 }
 
 func optionsContainValue(options []EnvValueOptionItem, v string) bool {

@@ -126,6 +126,7 @@ type Permission struct {
 	AppData        bool                 `yaml:"appData,omitempty" json:"appData,omitempty"  description:"app data permission for writing"`
 	AppCache       bool                 `yaml:"appCache,omitempty" json:"appCache,omitempty"`
 	UserData       []string             `yaml:"userData,omitempty" json:"userData,omitempty"`
+	AppCommon      bool                 `yaml:"appCommon,omitempty" json:"appCommon,omitempty"`
 	Provider       []ProviderPermission `yaml:"provider,omitempty" json:"provider,omitempty"  description:"system shared data permission for accessing"`
 	ServiceAccount *string              `yaml:"serviceAccount,omitempty" json:"serviceAccount,omitempty" description:"service account for app permission"`
 }

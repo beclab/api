@@ -67,6 +67,16 @@ type ACL struct {
 	Dst    []string `json:"dst" yaml:"dst"`
 }
 
+type TailScalePolicy struct {
+	ACL           []ACL         `json:"acl,omitempty" yaml:"acl,omitempty"`
+	AutoApprovers AutoApprovers `json:"autoApprovers,omitempty" yaml:"autoApprovers,omitempty"`
+}
+
+type AutoApprovers struct {
+	Routes   map[string][]string `json:"routes,omitempty" yaml:"routes,omitempty"`
+	ExitNode []string            `yaml:"exitNode,omitempty" yaml:"exitNode,omitempty"`
+}
+
 type TailScale struct {
 	ACLs      []ACL    `json:"acls,omitempty" yaml:"acls"`
 	SubRoutes []string `json:"subRoutes,omitempty" yaml:"subRoutes"`

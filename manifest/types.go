@@ -379,8 +379,9 @@ type Ref struct {
 }
 
 type RefSubject struct {
-	Name string   `yaml:"name" json:"name"`
-	Perm []string `yaml:"perm" json:"perm"`
+	Name string `yaml:"name" json:"name"`
+	Pub  string `yaml:"pub" json:"pub"`
+	Sub  string `yaml:"sub" json:"sub"`
 }
 
 type PermissionNats struct {

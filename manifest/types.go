@@ -180,6 +180,7 @@ type Options struct {
 	AllowMultipleInstall bool                     `yaml:"allowMultipleInstall,omitempty" json:"allowMultipleInstall,omitempty"`
 	NeedsSharedAccess    bool                     `yaml:"needsSharedAccess,omitempty" json:"needsSharedAccess,omitempty"`
 	LLMGatewaySupported  bool                     `yaml:"LLMGatewaySupported,omitempty" json:"LLMGatewaySupported,omitempty"`
+	TemplateOnly         bool                     `yaml:"templateOnly,omitempty" json:"templateOnly,omitempty"`
 }
 
 type ResetCookie struct {

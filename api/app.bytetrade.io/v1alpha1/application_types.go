@@ -78,8 +78,9 @@ type AutoApprovers struct {
 }
 
 type TailScale struct {
-	ACLs      []ACL    `json:"acls,omitempty" yaml:"acls"`
-	SubRoutes []string `json:"subRoutes,omitempty" yaml:"subRoutes"`
+	ACLs              []ACL    `json:"acls,omitempty" yaml:"acls"`
+	SubRoutes         []string `json:"subRoutes,omitempty" yaml:"subRoutes"`
+	AdvertiseExitNode string   `json:"advertiseExitNode,omitempty" yaml:"advertiseExitNode,omitempty"`
 }
 
 type EntranceState string

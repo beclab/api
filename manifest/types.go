@@ -181,6 +181,7 @@ type Options struct {
 	NeedsSharedAccess    bool                     `yaml:"needsSharedAccess,omitempty" json:"needsSharedAccess,omitempty"`
 	LLMGatewaySupported  bool                     `yaml:"LLMGatewaySupported,omitempty" json:"LLMGatewaySupported,omitempty"`
 	TemplateOnly         bool                     `yaml:"templateOnly,omitempty" json:"templateOnly,omitempty"`
+	Shared               bool                     `yaml:"shared" json:"shared"`
 }
 
 type ResetCookie struct {

@@ -19,9 +19,13 @@ const (
 	// AppVersionV3 is the value of AppApiVersionLabel for v3 apps.
 	AppVersionV3 = "v3"
 
+	AppVersionV1 = "v1"
+
 	// userSettingsKeyAuthLevel is the key inside Spec.UserSettings[user]
 	// that stores a JSON blob mapping entrance name → auth level.
 	userSettingsKeyAuthLevel = "authLevel"
+
+	AppSharedLabel = "app.bytetrade.io/app-shared"
 )
 
 // IsV3 reports whether the given object (Application or ApplicationManager)
@@ -31,6 +35,13 @@ func IsV3(o metav1.Object) bool {
 		return false
 	}
 	return o.GetLabels()[AppApiVersionLabel] == AppVersionV3
+}
+
+func IsShared(o metav1.Object) bool {
+	if o == nil {
+		return false
+	}
+	return o.GetLabels()[AppSharedLabel] == "true"
 }
 
 // EffectiveSettings returns Spec.Settings overlaid with UserSettings[user]
@@ -48,7 +59,7 @@ func (app *Application) EffectiveSettings(user string) map[string]string {
 	for k, v := range app.Spec.Settings {
 		out[k] = v
 	}
-	if !IsV3(app) || user == "" {
+	if !IsShared(app) || user == "" {
 		return out
 	}
 
@@ -74,7 +85,7 @@ func (app *Application) EffectiveEntrances(user string) []Entrance {
 	}
 	out := make([]Entrance, len(app.Spec.Entrances))
 	copy(out, app.Spec.Entrances)
-	if !IsV3(app) || user == "" {
+	if !IsShared(app) || user == "" {
 		return out
 	}
 	overlay, ok := app.Spec.UserSettings[user]

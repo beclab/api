@@ -8,11 +8,11 @@ import (
 )
 
 // helper to build an Application with the v3 label.
-func newV3App(spec ApplicationSpec) *Application {
+func newSharedApp(spec ApplicationSpec) *Application {
 	return &Application{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:   "demo",
-			Labels: map[string]string{AppApiVersionLabel: AppVersionV3},
+			Labels: map[string]string{AppSharedLabel: AppSharedTrue},
 		},
 		Spec: spec,
 	}
@@ -26,7 +26,7 @@ func newV1App(spec ApplicationSpec) *Application {
 	}
 }
 
-func TestIsV3(t *testing.T) {
+func TestIsShared(t *testing.T) {
 	tests := []struct {
 		name string
 		obj  metav1.Object
@@ -52,22 +52,22 @@ func TestIsV3(t *testing.T) {
 		{
 			name: "v3 label on Application",
 			obj: &Application{ObjectMeta: metav1.ObjectMeta{
-				Labels: map[string]string{AppApiVersionLabel: AppVersionV3},
+				Labels: map[string]string{AppSharedLabel: AppSharedTrue},
 			}},
 			want: true,
 		},
 		{
 			name: "v3 label on ApplicationManager",
 			obj: &ApplicationManager{ObjectMeta: metav1.ObjectMeta{
-				Labels: map[string]string{AppApiVersionLabel: AppVersionV3},
+				Labels: map[string]string{AppSharedLabel: AppSharedTrue},
 			}},
 			want: true,
 		},
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			if got := IsV3(tc.obj); got != tc.want {
-				t.Fatalf("IsV3() = %v, want %v", got, tc.want)
+			if got := IsShared(tc.obj); got != tc.want {
+				t.Fatalf("IsShared() = %v, want %v", got, tc.want)
 			}
 		})
 	}
@@ -108,7 +108,7 @@ func TestEffectiveSettings(t *testing.T) {
 	})
 
 	t.Run("v3 app with empty user returns global Settings", func(t *testing.T) {
-		app := newV3App(ApplicationSpec{
+		app := newSharedApp(ApplicationSpec{
 			Settings: map[string]string{"title": "Demo"},
 			UserSettings: map[string]map[string]string{
 				"alice": {"customDomain": `{"e1":{"third_party_domain":"a.example.com"}}`},
@@ -122,7 +122,7 @@ func TestEffectiveSettings(t *testing.T) {
 	})
 
 	t.Run("v3 app with no overlay returns global Settings", func(t *testing.T) {
-		app := newV3App(ApplicationSpec{
+		app := newSharedApp(ApplicationSpec{
 			Settings: map[string]string{"title": "Demo"},
 			UserSettings: map[string]map[string]string{
 				"alice": {"customDomain": "a-only"},
@@ -136,7 +136,7 @@ func TestEffectiveSettings(t *testing.T) {
 	})
 
 	t.Run("v3 app overlays user-specific keys on top of Settings", func(t *testing.T) {
-		app := newV3App(ApplicationSpec{
+		app := newSharedApp(ApplicationSpec{
 			Settings: map[string]string{
 				"title":        "Demo",
 				"customDomain": `{"e1":{"third_party_domain":"global.example.com"}}`,
@@ -214,8 +214,8 @@ func TestEffectiveEntrances(t *testing.T) {
 		}
 	})
 
-	t.Run("v3 app overlays AuthLevel from UserSettings[user][authLevel]", func(t *testing.T) {
-		app := newV3App(ApplicationSpec{
+	t.Run("shared app overlays AuthLevel from UserSettings[user][authLevel]", func(t *testing.T) {
+		app := newSharedApp(ApplicationSpec{
 			Entrances: baseEntrances,
 			UserSettings: map[string]map[string]string{
 				"alice": {"authLevel": `{"e1":"private","e2":"public"}`},
@@ -248,8 +248,8 @@ func TestEffectiveEntrances(t *testing.T) {
 		}
 	})
 
-	t.Run("v3 app empty user returns global Entrances", func(t *testing.T) {
-		app := newV3App(ApplicationSpec{
+	t.Run("shared app empty user returns global Entrances", func(t *testing.T) {
+		app := newSharedApp(ApplicationSpec{
 			Entrances: baseEntrances,
 			UserSettings: map[string]map[string]string{
 				"alice": {"authLevel": `{"e1":"private"}`},
@@ -261,8 +261,8 @@ func TestEffectiveEntrances(t *testing.T) {
 		}
 	})
 
-	t.Run("v3 app missing authLevel overlay returns global Entrances", func(t *testing.T) {
-		app := newV3App(ApplicationSpec{
+	t.Run("shared app missing authLevel overlay returns global Entrances", func(t *testing.T) {
+		app := newSharedApp(ApplicationSpec{
 			Entrances: baseEntrances,
 			UserSettings: map[string]map[string]string{
 				"alice": {"customDomain": "x"},
@@ -274,8 +274,8 @@ func TestEffectiveEntrances(t *testing.T) {
 		}
 	})
 
-	t.Run("v3 app malformed authLevel JSON falls back to globals", func(t *testing.T) {
-		app := newV3App(ApplicationSpec{
+	t.Run("shared app malformed authLevel JSON falls back to globals", func(t *testing.T) {
+		app := newSharedApp(ApplicationSpec{
 			Entrances: baseEntrances,
 			UserSettings: map[string]map[string]string{
 				"alice": {"authLevel": `{not valid json`},
@@ -287,8 +287,8 @@ func TestEffectiveEntrances(t *testing.T) {
 		}
 	})
 
-	t.Run("v3 app empty string AuthLevel value is ignored", func(t *testing.T) {
-		app := newV3App(ApplicationSpec{
+	t.Run("shared app empty string AuthLevel value is ignored", func(t *testing.T) {
+		app := newSharedApp(ApplicationSpec{
 			Entrances: baseEntrances,
 			UserSettings: map[string]map[string]string{
 				"alice": {"authLevel": `{"e1":""}`},
@@ -301,7 +301,7 @@ func TestEffectiveEntrances(t *testing.T) {
 	})
 
 	t.Run("v3 app unknown entrance name in overlay is silently skipped", func(t *testing.T) {
-		app := newV3App(ApplicationSpec{
+		app := newSharedApp(ApplicationSpec{
 			Entrances: baseEntrances,
 			UserSettings: map[string]map[string]string{
 				"alice": {"authLevel": `{"e1":"private","does-not-exist":"public"}`},

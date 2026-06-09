@@ -33,7 +33,7 @@ func TestStorageUser(t *testing.T) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	c := fake.NewFakeClientWithScheme(scheme.Scheme)
+	c := fake.NewClientBuilder().WithScheme(scheme.Scheme).Build()
 
 	key := types.NamespacedName{
 		Name: "foo",

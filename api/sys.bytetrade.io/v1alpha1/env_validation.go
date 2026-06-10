@@ -12,6 +12,7 @@ import (
 	"strings"
 
 	"github.com/dlclark/regexp2"
+	"k8s.io/apimachinery/pkg/api/resource"
 	"k8s.io/apimachinery/pkg/util/validation"
 )
 
@@ -75,6 +76,11 @@ func (e *EnvVarSpec) validateType(value string) error {
 	case "int":
 		_, err := strconv.Atoi(value)
 		return err
+	case "quantity":
+		if _, err := resource.ParseQuantity(value); err != nil {
+			return fmt.Errorf("invalid quantity '%s': %w", value, err)
+		}
+		return nil
 	case "bool":
 		_, err := strconv.ParseBool(value)
 		return err

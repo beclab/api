@@ -247,7 +247,7 @@ type ResourceRequirement struct {
 
 type ResourceMode struct {
 	Mode                string `yaml:"mode" json:"mode"`
-	SupportMultiCard    bool   `yaml:"supportMultiCard,omitempty" json:"supportMultiCard,omitempty"`
+	SupportMultiCards   bool   `yaml:"supportMultiCards,omitempty" json:"supportMultiCards,omitempty"`
 	SupportMultiNodes   bool   `yaml:"supportMultiNodes,omitempty" json:"supportMultiNodes,omitempty"`
 	ResourceRequirement `yaml:",inline" json:",inline"`
 }

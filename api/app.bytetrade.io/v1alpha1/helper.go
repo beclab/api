@@ -2,6 +2,8 @@ package v1alpha1
 
 import (
 	"encoding/json"
+	"fmt"
+
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -107,4 +109,83 @@ func (app *Application) EffectiveEntrances(user string) []Entrance {
 		}
 	}
 	return out
+}
+
+// EntranceID builds the identifier of a single entrance from the app id and
+// the entrance's position. It is the single source of truth for the shared
+// rule: when an application exposes only one entrance the bare appid is
+// returned, otherwise the entrance index is appended (e.g. appid "abc123" at
+// index 2 -> "abc1232"). entranceIndex is 0-based and entranceCount is the
+// total number of entrances of the application.
+func EntranceID(appid string, entranceIndex, entranceCount int) string {
+	if entranceCount <= 1 {
+		return appid
+	}
+	return fmt.Sprintf("%s%d", appid, entranceIndex)
+}
+
+// EntranceID returns the id of this entrance for the given appid, honouring
+// the single-entrance rule. entranceIndex is the 0-based position of the
+// entrance within its application and entranceCount is the total number of
+// entrances. Unlike the application-level helpers, a bare Entrance does not
+// carry the appid, so it must be supplied by the caller.
+func (e Entrance) EntranceID(appid string, entranceIndex, entranceCount int) string {
+	return EntranceID(appid, entranceIndex, entranceCount)
+}
+
+// ForZone returns a copy of this entrance with its URL rewritten to
+// "<entranceID>.<zone>" for the given appid, honouring the single-entrance
+// rule. The receiver is never mutated.
+func (e Entrance) ForZone(appid, zone string, entranceIndex, entranceCount int) Entrance {
+	out := e
+	out.URL = fmt.Sprintf("%s.%s", e.EntranceID(appid, entranceIndex, entranceCount), zone)
+	return out
+}
+
+// Entrances is a named type over []Entrance that provides bulk helpers
+// honouring the single-entrance rule. Callers holding a plain slice can
+// convert with Entrances(s). The slice length supplies the entrance count, so
+// the single-entrance rule is applied automatically.
+type Entrances []Entrance
+
+// EntranceIDs returns the id of every entrance in the list for the given
+// appid, preserving order and honouring the single-entrance rule.
+func (es Entrances) EntranceIDs(appid string) []string {
+	ids := make([]string, len(es))
+	for i := range es {
+		ids[i] = es[i].EntranceID(appid, i, len(es))
+	}
+	return ids
+}
+
+// ForZone returns a copy of the list with each entry's URL rewritten to
+// "<entranceID>.<zone>" for the given appid, honouring the single-entrance
+// rule. The receiver is never mutated.
+func (es Entrances) ForZone(appid, zone string) Entrances {
+	out := make(Entrances, len(es))
+	for i := range es {
+		out[i] = es[i].ForZone(appid, zone, i, len(es))
+	}
+	return out
+}
+
+// EntranceIDs returns the entrance id of every entrance of the application,
+// preserving entrance order and honouring the single-entrance rule. Safe to
+// call on a nil receiver.
+func (app *Application) EntranceIDs() []string {
+	if app == nil {
+		return nil
+	}
+	return Entrances(app.Spec.Entrances).EntranceIDs(app.Spec.Appid)
+}
+
+// EntrancesForZone returns a copy of the application entrances with each URL
+// rewritten to "<entranceID>.<zone>", where entranceID honours the
+// single-entrance rule. The original CR is never mutated. Safe to call on a
+// nil receiver.
+func (app *Application) EntrancesForZone(zone string) []Entrance {
+	if app == nil {
+		return nil
+	}
+	return Entrances(app.Spec.Entrances).ForZone(app.Spec.Appid, zone)
 }

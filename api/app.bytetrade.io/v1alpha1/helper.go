@@ -1,6 +1,8 @@
 package v1alpha1
 
 import (
+	"crypto/md5"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 
@@ -188,4 +190,80 @@ func (app *Application) EntrancesForZone(zone string) []Entrance {
 		return nil
 	}
 	return Entrances(app.Spec.Entrances).ForZone(app.Spec.Appid, zone)
+}
+
+// SharedEntrancePrefix returns the 8-char prefix used to build shared entrance
+// ids: the first 8 hex chars of md5(appid + "shared"). This is the only
+// difference from the regular entrance id, which uses the bare appid.
+func SharedEntrancePrefix(appid string) string {
+	hash := md5.Sum([]byte(appid + "shared"))
+	return hex.EncodeToString(hash[:])[:8]
+}
+
+// SharedEntranceID returns the id of a single shared entrance, honouring the
+// single-entrance rule. It mirrors EntranceID but the prefix is
+// md5(appid + "shared")[:8] instead of the bare appid.
+func SharedEntranceID(appid string, entranceIndex, entranceCount int) string {
+	prefix := SharedEntrancePrefix(appid)
+	if entranceCount <= 1 {
+		return prefix
+	}
+	return fmt.Sprintf("%s%d", prefix, entranceIndex)
+}
+
+// SharedEntranceID returns the id of this shared entrance for the given appid,
+// honouring the single-entrance rule. See SharedEntranceID for the id format.
+func (e Entrance) SharedEntranceID(appid string, entranceIndex, entranceCount int) string {
+	return SharedEntranceID(appid, entranceIndex, entranceCount)
+}
+
+// SharedForZone returns a copy of this shared entrance with its URL rewritten
+// to "<sharedEntranceID>.<zone>" for the given appid. The receiver is never
+// mutated.
+func (e Entrance) SharedForZone(appid, zone string, entranceIndex, entranceCount int) Entrance {
+	out := e
+	out.URL = fmt.Sprintf("%s.%s", e.SharedEntranceID(appid, entranceIndex, entranceCount), zone)
+	return out
+}
+
+// SharedEntranceIDs returns the shared entrance id of every entrance in the
+// list for the given appid, preserving order and honouring the single-entrance
+// rule.
+func (es Entrances) SharedEntranceIDs(appid string) []string {
+	ids := make([]string, len(es))
+	for i := range es {
+		ids[i] = es[i].SharedEntranceID(appid, i, len(es))
+	}
+	return ids
+}
+
+// SharedForZone returns a copy of the list with each entry's URL rewritten to
+// "<sharedEntranceID>.<zone>" for the given appid. The receiver is never
+// mutated.
+func (es Entrances) SharedForZone(appid, zone string) Entrances {
+	out := make(Entrances, len(es))
+	for i := range es {
+		out[i] = es[i].SharedForZone(appid, zone, i, len(es))
+	}
+	return out
+}
+
+// SharedEntranceIDs returns the shared entrance id of every entry in
+// Spec.SharedEntrances, honouring the single-entrance rule. Safe to call on a
+// nil receiver.
+func (app *Application) SharedEntranceIDs() []string {
+	if app == nil {
+		return nil
+	}
+	return Entrances(app.Spec.SharedEntrances).SharedEntranceIDs(app.Spec.Appid)
+}
+
+// SharedEntrancesForZone returns a copy of Spec.SharedEntrances with each URL
+// rewritten to "<sharedEntranceID>.<zone>". The original CR is never mutated.
+// Safe to call on a nil receiver.
+func (app *Application) SharedEntrancesForZone(zone string) []Entrance {
+	if app == nil {
+		return nil
+	}
+	return Entrances(app.Spec.SharedEntrances).SharedForZone(app.Spec.Appid, zone)
 }

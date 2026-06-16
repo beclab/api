@@ -318,110 +318,59 @@ func TestEffectiveEntrances(t *testing.T) {
 	})
 }
 
-func TestPublicDomainPrefixes(t *testing.T) {
+func TestThirdLevelCusDomainPrefixes(t *testing.T) {
 	t.Run("nil app returns nil", func(t *testing.T) {
 		var app *Application
-		if got := app.PublicDomainPrefixes("alice"); got != nil {
-			t.Fatalf("PublicDomainPrefixes(nil) = %v, want nil", got)
+		if got := app.ThirdLevelCusDomainPrefixes(); got != nil {
+			t.Fatalf("ThirdLevelCusDomainPrefixes(nil) = %v, want nil", got)
 		}
 	})
 
 	t.Run("no entrances returns nil", func(t *testing.T) {
-		app := newV1App(ApplicationSpec{Appid: "abc123"})
-		if got := app.PublicDomainPrefixes("alice"); got != nil {
-			t.Fatalf("PublicDomainPrefixes(no entrances) = %v, want nil", got)
+		app := newV1App(ApplicationSpec{Appid: "abc123", Owner: "alice"})
+		if got := app.ThirdLevelCusDomainPrefixes(); got != nil {
+			t.Fatalf("ThirdLevelCusDomainPrefixes(no entrances) = %v, want nil", got)
 		}
 	})
 
-	t.Run("single public entrance returns appid", func(t *testing.T) {
-		app := newV1App(ApplicationSpec{
-			Appid: "abc123",
+	t.Run("returns third_level_domain from owner userSettings", func(t *testing.T) {
+		app := newSharedApp(ApplicationSpec{
+			Appid: "e3111194",
+			Owner: "olaresid",
 			Entrances: []Entrance{
-				{Name: "e1", Host: "h1", Port: 80, AuthLevel: ApplicationAuthLevelPublic},
+				{Name: "terminal", Host: "terminal", Port: 80, AuthLevel: "private"},
+				{Name: "ollama", Host: "ollama", Port: 11434, AuthLevel: "internal", Invisible: true},
+			},
+			UserSettings: map[string]map[string]string{
+				"olaresid": {
+					userSettingsKeyAuthLevel: `{"terminal":"public"}`,
+					settingsKeyCustomDomain:  `{"terminal":{"third_level_domain":"qq","third_party_domain":""}}`,
+				},
 			},
 		})
-		got := app.PublicDomainPrefixes("alice")
-		want := []string{"abc123"}
+		got := app.ThirdLevelCusDomainPrefixes()
+		want := []string{"qq"}
 		if !reflect.DeepEqual(got, want) {
-			t.Fatalf("PublicDomainPrefixes(single public) = %v, want %v", got, want)
+			t.Fatalf("ThirdLevelCusDomainPrefixes(shared app) = %v, want %v", got, want)
 		}
 	})
 
-	t.Run("multiple public entrances append index", func(t *testing.T) {
-		app := newV1App(ApplicationSpec{
-			Appid: "abc123",
-			Entrances: []Entrance{
-				{Name: "e1", Host: "h1", Port: 80, AuthLevel: ApplicationAuthLevelPublic},
-				{Name: "e2", Host: "h2", Port: 81, AuthLevel: ApplicationAuthLevelPublic},
-			},
-		})
-		got := app.PublicDomainPrefixes("alice")
-		want := []string{"abc1230", "abc1231"}
-		if !reflect.DeepEqual(got, want) {
-			t.Fatalf("PublicDomainPrefixes(multi public) = %v, want %v", got, want)
-		}
-	})
-
-	t.Run("private entrances are skipped", func(t *testing.T) {
-		app := newV1App(ApplicationSpec{
-			Appid: "abc123",
-			Entrances: []Entrance{
-				{Name: "e1", Host: "h1", Port: 80, AuthLevel: "private"},
-				{Name: "e2", Host: "h2", Port: 81, AuthLevel: ApplicationAuthLevelPublic},
-			},
-		})
-		got := app.PublicDomainPrefixes("alice")
-		want := []string{"abc1231"}
-		if !reflect.DeepEqual(got, want) {
-			t.Fatalf("PublicDomainPrefixes(mixed auth) = %v, want %v", got, want)
-		}
-	})
-
-	t.Run("public custom third-level domain prefix appended after defaults", func(t *testing.T) {
-		app := newV1App(ApplicationSpec{
-			Appid: "abc123",
-			Entrances: []Entrance{
-				{Name: "e1", Host: "h1", Port: 80, AuthLevel: ApplicationAuthLevelPublic},
-				{Name: "e2", Host: "h2", Port: 81, AuthLevel: ApplicationAuthLevelPublic},
-			},
-			Settings: map[string]string{
-				settingsKeyCustomDomain: `{"e1":{"thirdLevelDomain":"custom-e1"},"e2":{"thirdLevelDomain":"custom-e2"}}`,
-			},
-		})
-		got := app.PublicDomainPrefixes("alice")
-		want := []string{"abc1230", "abc1231", "custom-e1", "custom-e2"}
-		if !reflect.DeepEqual(got, want) {
-			t.Fatalf("PublicDomainPrefixes(custom third level) = %v, want %v", got, want)
-		}
-	})
-
-	t.Run("custom third-level domain prefix skipped for private entrance", func(t *testing.T) {
-		app := newV1App(ApplicationSpec{
-			Appid: "abc123",
-			Entrances: []Entrance{
-				{Name: "e1", Host: "h1", Port: 80, AuthLevel: "private"},
-			},
-			Settings: map[string]string{
-				settingsKeyCustomDomain: `{"e1":{"thirdLevelDomain":"custom-e1"}}`,
-			},
-		})
-		if got := app.PublicDomainPrefixes("alice"); got != nil {
-			t.Fatalf("PublicDomainPrefixes(private custom) = %v, want nil", got)
-		}
-	})
-
-	t.Run("shared app uses per-user authLevel overlay", func(t *testing.T) {
+	t.Run("missing third_level_domain returns empty", func(t *testing.T) {
 		app := newSharedApp(ApplicationSpec{
 			Appid: "abc123",
+			Owner: "alice",
 			Entrances: []Entrance{
 				{Name: "e1", Host: "h1", Port: 80, AuthLevel: ApplicationAuthLevelPublic},
 			},
 			UserSettings: map[string]map[string]string{
-				"alice": {userSettingsKeyAuthLevel: `{"e1":"private"}`},
+				"alice": {
+					settingsKeyCustomDomain: `{"e1":{"thirdLevelDomain":"wrong-key"}}`,
+				},
 			},
 		})
-		if got := app.PublicDomainPrefixes("alice"); got != nil {
-			t.Fatalf("PublicDomainPrefixes(shared private) = %v, want nil", got)
+		got := app.ThirdLevelCusDomainPrefixes()
+		if len(got) != 0 {
+			t.Fatalf("ThirdLevelCusDomainPrefixes(wrong key) = %v, want empty", got)
 		}
 	})
 }

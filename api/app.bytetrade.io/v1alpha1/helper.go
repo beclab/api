@@ -12,7 +12,7 @@ import (
 type DefaultThirdLevelDomainConfig struct {
 	AppName          string `json:"appName"`
 	EntranceName     string `json:"entranceName"`
-	ThirdLevelDomain string `json:"thirdLevelDomain"`
+	ThirdLevelDomain string `json:"third_level_domain"`
 }
 
 const (
@@ -32,7 +32,7 @@ const (
 	settingsKeyCustomDomain = "customDomain"
 	// settingsCustomDomainThirdLevelDomain is the per-entrance key inside the
 	// customDomain JSON blob for a user-defined third-level domain prefix.
-	settingsCustomDomainThirdLevelDomain = "thirdLevelDomain"
+	settingsCustomDomainThirdLevelDomain = "third_level_domain"
 
 	ApplicationAuthLevelPublic = "public"
 

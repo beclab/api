@@ -29,6 +29,13 @@ const (
 	// that stores a JSON blob mapping entrance name → auth level.
 	userSettingsKeyAuthLevel = "authLevel"
 
+	settingsKeyCustomDomain = "customDomain"
+	// settingsCustomDomainThirdLevelDomain is the per-entrance key inside the
+	// customDomain JSON blob for a user-defined third-level domain prefix.
+	settingsCustomDomainThirdLevelDomain = "thirdLevelDomain"
+
+	ApplicationAuthLevelPublic = "public"
+
 	AppSharedLabel = "app.bytetrade.io/app-shared"
 	AppSharedTrue  = "true"
 )
@@ -266,4 +273,47 @@ func (app *Application) SharedEntrancesForZone(zone string) []Entrance {
 		return nil
 	}
 	return Entrances(app.Spec.SharedEntrances).SharedForZone(app.Spec.Appid, zone)
+}
+
+// settingsEntranceMap parses settings[key] as a JSON object mapping entrance
+// name → key/value pairs. Malformed or missing JSON yields nil.
+func settingsEntranceMap(settings map[string]string, key string) map[string]map[string]string {
+	blob, ok := settings[key]
+	if !ok || blob == "" {
+		return nil
+	}
+	var out map[string]map[string]string
+	if err := json.Unmarshal([]byte(blob), &out); err != nil {
+		return nil
+	}
+	return out
+}
+
+func (app *Application) ThirdLevelCusDomainPrefixes() []string {
+	if app == nil {
+		return nil
+	}
+	effectiveEntrances := app.EffectiveEntrances(app.Spec.Owner)
+	if len(effectiveEntrances) == 0 {
+		return nil
+	}
+	//entranceCount := len(effectiveEntrances)
+	customDomainEntrancesMap := settingsEntranceMap(app.EffectiveSettings(app.Spec.Owner), settingsKeyCustomDomain)
+
+	var out []string
+	var customDomainsPrefix []string
+	for _, entrance := range effectiveEntrances {
+		//prefix := EntranceID(app.Spec.Appid, index, entranceCount)
+
+		if cdEntrance, ok := customDomainEntrancesMap[entrance.Name]; ok {
+			if entrancePrefix := cdEntrance[settingsCustomDomainThirdLevelDomain]; entrancePrefix != "" {
+				customDomainsPrefix = append(customDomainsPrefix, entrancePrefix)
+
+			}
+		}
+
+		//out = append(out, prefix)
+
+	}
+	return append(out, customDomainsPrefix...)
 }

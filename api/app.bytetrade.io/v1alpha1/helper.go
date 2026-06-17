@@ -5,6 +5,7 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"strings"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
@@ -30,6 +31,9 @@ const (
 	userSettingsKeyAuthLevel = "authLevel"
 
 	settingsKeyCustomDomain = "customDomain"
+	// settingsKeyDefaultThirdLevelDomainConfig stores per-app default third-level
+	// domain overrides as a JSON array of DefaultThirdLevelDomainConfig.
+	settingsKeyDefaultThirdLevelDomainConfig = "defaultThirdLevelDomainConfig"
 	// settingsCustomDomainThirdLevelDomain is the per-entrance key inside the
 	// customDomain JSON blob for a user-defined third-level domain prefix.
 	settingsCustomDomainThirdLevelDomain = "third_level_domain"
@@ -289,7 +293,13 @@ func settingsEntranceMap(settings map[string]string, key string) map[string]map[
 	return out
 }
 
-func (app *Application) ThirdLevelCusDomainPrefixes() []string {
+// ThirdLevelCusDomainPrefixes returns the configured third-level domain
+// prefixes for every entrance of the application, each suffixed with
+// ".<zone>" to form a full host. When zone is empty the bare prefixes are
+// returned. The lookup uses Spec.Settings overlaid with the install owner's
+// UserSettings, so shared v3 apps see the owner's per-entrance overrides.
+// Safe to call on a nil receiver.
+func (app *Application) ThirdLevelCusDomainPrefixes(zone string) []string {
 	if app == nil {
 		return nil
 	}
@@ -297,23 +307,75 @@ func (app *Application) ThirdLevelCusDomainPrefixes() []string {
 	if len(effectiveEntrances) == 0 {
 		return nil
 	}
-	//entranceCount := len(effectiveEntrances)
 	customDomainEntrancesMap := settingsEntranceMap(app.EffectiveSettings(app.Spec.Owner), settingsKeyCustomDomain)
 
 	var out []string
-	var customDomainsPrefix []string
 	for _, entrance := range effectiveEntrances {
-		//prefix := EntranceID(app.Spec.Appid, index, entranceCount)
+		cdEntrance, ok := customDomainEntrancesMap[entrance.Name]
+		if !ok {
+			continue
+		}
+		entrancePrefix := cdEntrance[settingsCustomDomainThirdLevelDomain]
+		if entrancePrefix == "" {
+			continue
+		}
+		if zone == "" {
+			continue
+		}
+		out = append(out, fmt.Sprintf("%s.%s", entrancePrefix, zone))
+	}
+	return out
+}
 
-		if cdEntrance, ok := customDomainEntrancesMap[entrance.Name]; ok {
-			if entrancePrefix := cdEntrance[settingsCustomDomainThirdLevelDomain]; entrancePrefix != "" {
-				customDomainsPrefix = append(customDomainsPrefix, entrancePrefix)
+// EntrancesWithZone returns a copy of Spec.Entrances with each URL rewritten
+// for the given zone. When zone is empty the entrances are returned unchanged.
+// defaultThirdLevelDomainConfig in Spec.Settings can override individual
+// entrance URLs. The original CR is never mutated. Safe to call on a nil
+// receiver.
+func (app *Application) EntrancesWithZone(zone string) ([]Entrance, error) {
+	if app == nil {
+		return nil, nil
+	}
+	out := make([]Entrance, len(app.Spec.Entrances))
+	copy(out, app.Spec.Entrances)
+	if zone == "" {
+		return out, nil
+	}
 
+	var appDomainConfigs []DefaultThirdLevelDomainConfig
+	if defaultThirdLevelDomainConfig, ok := app.Spec.Settings[settingsKeyDefaultThirdLevelDomainConfig]; ok && defaultThirdLevelDomainConfig != "" {
+		if err := json.Unmarshal([]byte(defaultThirdLevelDomainConfig), &appDomainConfigs); err != nil {
+			return nil, err
+		}
+	}
+
+	appid := strings.ToLower(strings.TrimSpace(app.Spec.Appid))
+	n := len(out)
+	if n == 1 {
+		out[0] = out[0].ForZone(appid, zone, 0, 1)
+		return out, nil
+	}
+
+	entrancesForZone := Entrances(out).ForZone(appid, zone)
+	for i := range entrancesForZone {
+		out[i] = entrancesForZone[i]
+		for _, adc := range appDomainConfigs {
+			if adc.AppName == app.Spec.Name && adc.EntranceName == out[i].Name && adc.ThirdLevelDomain != "" {
+				out[i].URL = fmt.Sprintf("%s.%s", adc.ThirdLevelDomain, zone)
 			}
 		}
-
-		//out = append(out, prefix)
-
 	}
-	return append(out, customDomainsPrefix...)
+	return out, nil
+}
+
+// GenEntranceURLs returns a copy of Spec.Entrances with URLs filled from the
+// install owner's zone annotation (bytetrade.io/zone). Zone lookup errors are
+// ignored and the entrances are returned unchanged, matching legacy Provider
+// behaviour. Malformed defaultThirdLevelDomainConfig returns an error. The
+// original CR is never mutated. Safe to call on a nil receiver.
+func (app *Application) GenEntranceURLs(zone string) ([]Entrance, error) {
+	if app == nil {
+		return nil, nil
+	}
+	return app.EntrancesWithZone(zone)
 }

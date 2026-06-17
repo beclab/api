@@ -321,19 +321,19 @@ func TestEffectiveEntrances(t *testing.T) {
 func TestThirdLevelCusDomainPrefixes(t *testing.T) {
 	t.Run("nil app returns nil", func(t *testing.T) {
 		var app *Application
-		if got := app.ThirdLevelCusDomainPrefixes(); got != nil {
+		if got := app.ThirdLevelCusDomainPrefixes(""); got != nil {
 			t.Fatalf("ThirdLevelCusDomainPrefixes(nil) = %v, want nil", got)
 		}
 	})
 
 	t.Run("no entrances returns nil", func(t *testing.T) {
 		app := newV1App(ApplicationSpec{Appid: "abc123", Owner: "alice"})
-		if got := app.ThirdLevelCusDomainPrefixes(); got != nil {
+		if got := app.ThirdLevelCusDomainPrefixes(""); got != nil {
 			t.Fatalf("ThirdLevelCusDomainPrefixes(no entrances) = %v, want nil", got)
 		}
 	})
 
-	t.Run("returns third_level_domain from owner userSettings", func(t *testing.T) {
+	t.Run("empty zone returns bare prefixes", func(t *testing.T) {
 		app := newSharedApp(ApplicationSpec{
 			Appid: "e3111194",
 			Owner: "olaresid",
@@ -348,10 +348,32 @@ func TestThirdLevelCusDomainPrefixes(t *testing.T) {
 				},
 			},
 		})
-		got := app.ThirdLevelCusDomainPrefixes()
+		got := app.ThirdLevelCusDomainPrefixes("")
 		want := []string{"qq"}
 		if !reflect.DeepEqual(got, want) {
-			t.Fatalf("ThirdLevelCusDomainPrefixes(shared app) = %v, want %v", got, want)
+			t.Fatalf("ThirdLevelCusDomainPrefixes(empty zone) = %v, want %v", got, want)
+		}
+	})
+
+	t.Run("non-empty zone is appended", func(t *testing.T) {
+		app := newSharedApp(ApplicationSpec{
+			Appid: "e3111194",
+			Owner: "olaresid",
+			Entrances: []Entrance{
+				{Name: "terminal", Host: "terminal", Port: 80, AuthLevel: "private"},
+				{Name: "ollama", Host: "ollama", Port: 11434, AuthLevel: "internal", Invisible: true},
+			},
+			UserSettings: map[string]map[string]string{
+				"olaresid": {
+					userSettingsKeyAuthLevel: `{"terminal":"public"}`,
+					settingsKeyCustomDomain:  `{"terminal":{"third_level_domain":"qq","third_party_domain":""}}`,
+				},
+			},
+		})
+		got := app.ThirdLevelCusDomainPrefixes("olaresid.olares.cn")
+		want := []string{"qq.olaresid.olares.cn"}
+		if !reflect.DeepEqual(got, want) {
+			t.Fatalf("ThirdLevelCusDomainPrefixes(with zone) = %v, want %v", got, want)
 		}
 	})
 
@@ -368,9 +390,104 @@ func TestThirdLevelCusDomainPrefixes(t *testing.T) {
 				},
 			},
 		})
-		got := app.ThirdLevelCusDomainPrefixes()
+		got := app.ThirdLevelCusDomainPrefixes("olares.cn")
 		if len(got) != 0 {
 			t.Fatalf("ThirdLevelCusDomainPrefixes(wrong key) = %v, want empty", got)
+		}
+	})
+}
+
+func TestEntrancesWithZone(t *testing.T) {
+	t.Run("empty zone returns copy unchanged", func(t *testing.T) {
+		app := newV1App(ApplicationSpec{
+			Appid: "ABC123",
+			Entrances: []Entrance{
+				{Name: "e1", Host: "h1", Port: 80, URL: "keep-me"},
+			},
+		})
+		got, err := app.EntrancesWithZone("")
+		if err != nil {
+			t.Fatalf("EntrancesWithZone() error = %v", err)
+		}
+		if got[0].URL != "keep-me" {
+			t.Fatalf("EntrancesWithZone(empty zone) = %q, want %q", got[0].URL, "keep-me")
+		}
+	})
+
+	t.Run("single entrance uses appid.zone", func(t *testing.T) {
+		app := newV1App(ApplicationSpec{
+			Appid: "ABC123",
+			Entrances: []Entrance{
+				{Name: "terminal", Host: "terminal", Port: 80},
+			},
+		})
+		got, err := app.EntrancesWithZone("olares.cn")
+		if err != nil {
+			t.Fatalf("EntrancesWithZone() error = %v", err)
+		}
+		want := "abc123.olares.cn"
+		if got[0].URL != want {
+			t.Fatalf("EntrancesWithZone(single) = %q, want %q", got[0].URL, want)
+		}
+	})
+
+	t.Run("multiple entrances with defaultThirdLevelDomainConfig override", func(t *testing.T) {
+		app := newV1App(ApplicationSpec{
+			Appid: "e3111194",
+			Name:  "ollamav3",
+			Entrances: []Entrance{
+				{Name: "terminal", Host: "terminal", Port: 80},
+				{Name: "ollama", Host: "ollama", Port: 11434},
+			},
+			Settings: map[string]string{
+				settingsKeyDefaultThirdLevelDomainConfig: `[{"appName":"ollamav3","entranceName":"terminal","third_level_domain":"qq"}]`,
+			},
+		})
+		got, err := app.EntrancesWithZone("olares.cn")
+		if err != nil {
+			t.Fatalf("EntrancesWithZone() error = %v", err)
+		}
+		want := []string{"qq.olares.cn", "e31111941.olares.cn"}
+		for i := range want {
+			if got[i].URL != want[i] {
+				t.Fatalf("EntrancesWithZone()[%d] = %q, want %q", i, got[i].URL, want[i])
+			}
+		}
+	})
+}
+
+func TestGenEntranceURLs(t *testing.T) {
+	t.Run("non-empty zone fills URLs", func(t *testing.T) {
+		app := newV1App(ApplicationSpec{
+			Appid: "abc123",
+			Owner: "olaresid",
+			Entrances: []Entrance{
+				{Name: "terminal", Host: "terminal", Port: 80},
+			},
+		})
+		got, err := app.GenEntranceURLs("olares.cn")
+		if err != nil {
+			t.Fatalf("GenEntranceURLs() error = %v", err)
+		}
+		if got[0].URL != "abc123.olares.cn" {
+			t.Fatalf("GenEntranceURLs() = %q, want %q", got[0].URL, "abc123.olares.cn")
+		}
+	})
+
+	t.Run("empty zone leaves entrances unchanged", func(t *testing.T) {
+		app := newV1App(ApplicationSpec{
+			Appid: "abc123",
+			Owner: "olaresid",
+			Entrances: []Entrance{
+				{Name: "terminal", Host: "terminal", Port: 80, URL: "unchanged"},
+			},
+		})
+		got, err := app.GenEntranceURLs("")
+		if err != nil {
+			t.Fatalf("GenEntranceURLs() error = %v", err)
+		}
+		if got[0].URL != "unchanged" {
+			t.Fatalf("GenEntranceURLs() = %q, want %q", got[0].URL, "unchanged")
 		}
 	})
 }

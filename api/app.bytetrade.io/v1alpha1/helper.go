@@ -299,15 +299,15 @@ func settingsEntranceMap(settings map[string]string, key string) map[string]map[
 // returned. The lookup uses Spec.Settings overlaid with the install owner's
 // UserSettings, so shared v3 apps see the owner's per-entrance overrides.
 // Safe to call on a nil receiver.
-func (app *Application) ThirdLevelCusDomainURLs(zone string) []string {
+func (app *Application) ThirdLevelCusDomainURLs(zone string, owner string) []string {
 	if app == nil {
 		return nil
 	}
-	effectiveEntrances := app.EffectiveEntrances(app.Spec.Owner)
+	effectiveEntrances := app.EffectiveEntrances(owner)
 	if len(effectiveEntrances) == 0 {
 		return nil
 	}
-	customDomainEntrancesMap := settingsEntranceMap(app.EffectiveSettings(app.Spec.Owner), settingsKeyCustomDomain)
+	customDomainEntrancesMap := settingsEntranceMap(app.EffectiveSettings(owner), settingsKeyCustomDomain)
 
 	var out []string
 	for _, entrance := range effectiveEntrances {

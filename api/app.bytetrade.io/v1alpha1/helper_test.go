@@ -321,15 +321,15 @@ func TestEffectiveEntrances(t *testing.T) {
 func TestThirdLevelCusDomainPrefixes(t *testing.T) {
 	t.Run("nil app returns nil", func(t *testing.T) {
 		var app *Application
-		if got := app.ThirdLevelCusDomainPrefixes(""); got != nil {
-			t.Fatalf("ThirdLevelCusDomainPrefixes(nil) = %v, want nil", got)
+		if got := app.ThirdLevelCusDomainURLs(""); got != nil {
+			t.Fatalf("ThirdLevelCusDomainURLs(nil) = %v, want nil", got)
 		}
 	})
 
 	t.Run("no entrances returns nil", func(t *testing.T) {
 		app := newV1App(ApplicationSpec{Appid: "abc123", Owner: "alice"})
-		if got := app.ThirdLevelCusDomainPrefixes(""); got != nil {
-			t.Fatalf("ThirdLevelCusDomainPrefixes(no entrances) = %v, want nil", got)
+		if got := app.ThirdLevelCusDomainURLs(""); got != nil {
+			t.Fatalf("ThirdLevelCusDomainURLs(no entrances) = %v, want nil", got)
 		}
 	})
 
@@ -348,10 +348,10 @@ func TestThirdLevelCusDomainPrefixes(t *testing.T) {
 				},
 			},
 		})
-		got := app.ThirdLevelCusDomainPrefixes("")
-		want := []string{"qq"}
+		got := app.ThirdLevelCusDomainURLs("")
+		want := []string{}
 		if !reflect.DeepEqual(got, want) {
-			t.Fatalf("ThirdLevelCusDomainPrefixes(empty zone) = %v, want %v", got, want)
+			t.Fatalf("ThirdLevelCusDomainURLs(empty zone) = %v, want %v", got, want)
 		}
 	})
 
@@ -370,10 +370,10 @@ func TestThirdLevelCusDomainPrefixes(t *testing.T) {
 				},
 			},
 		})
-		got := app.ThirdLevelCusDomainPrefixes("olaresid.olares.cn")
+		got := app.ThirdLevelCusDomainURLs("olaresid.olares.cn")
 		want := []string{"qq.olaresid.olares.cn"}
 		if !reflect.DeepEqual(got, want) {
-			t.Fatalf("ThirdLevelCusDomainPrefixes(with zone) = %v, want %v", got, want)
+			t.Fatalf("ThirdLevelCusDomainURLs(with zone) = %v, want %v", got, want)
 		}
 	})
 
@@ -390,9 +390,9 @@ func TestThirdLevelCusDomainPrefixes(t *testing.T) {
 				},
 			},
 		})
-		got := app.ThirdLevelCusDomainPrefixes("olares.cn")
+		got := app.ThirdLevelCusDomainURLs("olares.cn")
 		if len(got) != 0 {
-			t.Fatalf("ThirdLevelCusDomainPrefixes(wrong key) = %v, want empty", got)
+			t.Fatalf("ThirdLevelCusDomainURLs(wrong key) = %v, want empty", got)
 		}
 	})
 }

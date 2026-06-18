@@ -293,13 +293,13 @@ func settingsEntranceMap(settings map[string]string, key string) map[string]map[
 	return out
 }
 
-// ThirdLevelCusDomainPrefixes returns the configured third-level domain
+// ThirdLevelCusDomainURLs returns the configured third-level domain
 // prefixes for every entrance of the application, each suffixed with
 // ".<zone>" to form a full host. When zone is empty the bare prefixes are
 // returned. The lookup uses Spec.Settings overlaid with the install owner's
 // UserSettings, so shared v3 apps see the owner's per-entrance overrides.
 // Safe to call on a nil receiver.
-func (app *Application) ThirdLevelCusDomainPrefixes(zone string) []string {
+func (app *Application) ThirdLevelCusDomainURLs(zone string) []string {
 	if app == nil {
 		return nil
 	}

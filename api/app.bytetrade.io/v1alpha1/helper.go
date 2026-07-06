@@ -228,12 +228,35 @@ func (e Entrance) SharedEntranceID(appid string, entranceIndex, entranceCount in
 	return SharedEntranceID(appid, entranceIndex, entranceCount)
 }
 
+// SharedEntranceIDV2 returns the id of a single shared entrance, honouring the
+// single-entrance rule. It mirrors EntranceID but the prefix is
+// md5(appid + "shared")[:8] instead of the bare appid.
+func SharedEntranceIDV2(appid string, entranceIndex, entranceCount int) string {
+	prefix := SharedEntrancePrefix(appid)
+	return fmt.Sprintf("%s%d", prefix, entranceIndex)
+}
+
+// SharedEntranceIDV2 returns the id of this shared entrance for the given appid,
+// honouring the single-entrance rule. See SharedEntranceID for the id format.
+func (e Entrance) SharedEntranceIDV2(appid string, entranceIndex, entranceCount int) string {
+	return SharedEntranceIDV2(appid, entranceIndex, entranceCount)
+}
+
 // SharedForZone returns a copy of this shared entrance with its URL rewritten
 // to "<sharedEntranceID>.<zone>" for the given appid. The receiver is never
 // mutated.
 func (e Entrance) SharedForZone(appid, zone string, entranceIndex, entranceCount int) Entrance {
 	out := e
 	out.URL = fmt.Sprintf("%s.%s", e.SharedEntranceID(appid, entranceIndex, entranceCount), zone)
+	return out
+}
+
+// SharedForZoneV2 returns a copy of this shared entrance with its URL rewritten
+// to "<sharedEntranceID>.<zone>" for the given appid. The receiver is never
+// mutated.
+func (e Entrance) SharedForZoneV2(appid, zone string, entranceIndex, entranceCount int) Entrance {
+	out := e
+	out.URL = fmt.Sprintf("%s.%s", e.SharedEntranceIDV2(appid, entranceIndex, entranceCount), zone)
 	return out
 }
 
@@ -255,6 +278,17 @@ func (es Entrances) SharedForZone(appid, zone string) Entrances {
 	out := make(Entrances, len(es))
 	for i := range es {
 		out[i] = es[i].SharedForZone(appid, zone, i, len(es))
+	}
+	return out
+}
+
+// SharedForZoneV2 returns a copy of the list with each entry's URL rewritten to
+// "<sharedEntranceID>.<zone>" for the given appid. The receiver is never
+// mutated.
+func (es Entrances) SharedForZoneV2(appid, zone string) Entrances {
+	out := make(Entrances, len(es))
+	for i := range es {
+		out[i] = es[i].SharedForZoneV2(appid, zone, i, len(es))
 	}
 	return out
 }

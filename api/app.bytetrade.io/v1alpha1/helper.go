@@ -214,26 +214,23 @@ func SharedEntrancePrefix(appid string) string {
 // SharedEntranceID returns the id of a single shared entrance, honouring the
 // single-entrance rule. It mirrors EntranceID but the prefix is
 // md5(appid + "shared")[:8] instead of the bare appid.
-func SharedEntranceID(appid string, entranceIndex, entranceCount int) string {
+func SharedEntranceID(appid string, entranceIndex int) string {
 	prefix := SharedEntrancePrefix(appid)
-	if entranceCount <= 1 {
-		return prefix
-	}
 	return fmt.Sprintf("%s%d", prefix, entranceIndex)
 }
 
 // SharedEntranceID returns the id of this shared entrance for the given appid,
 // honouring the single-entrance rule. See SharedEntranceID for the id format.
-func (e Entrance) SharedEntranceID(appid string, entranceIndex, entranceCount int) string {
-	return SharedEntranceID(appid, entranceIndex, entranceCount)
+func (e Entrance) SharedEntranceID(appid string, entranceIndex int) string {
+	return SharedEntranceID(appid, entranceIndex)
 }
 
 // SharedForZone returns a copy of this shared entrance with its URL rewritten
 // to "<sharedEntranceID>.<zone>" for the given appid. The receiver is never
 // mutated.
-func (e Entrance) SharedForZone(appid, zone string, entranceIndex, entranceCount int) Entrance {
+func (e Entrance) SharedForZone(appid, zone string, entranceIndex int) Entrance {
 	out := e
-	out.URL = fmt.Sprintf("%s.%s", e.SharedEntranceID(appid, entranceIndex, entranceCount), zone)
+	out.URL = fmt.Sprintf("%s.%s", e.SharedEntranceID(appid, entranceIndex), zone)
 	return out
 }
 
@@ -243,7 +240,7 @@ func (e Entrance) SharedForZone(appid, zone string, entranceIndex, entranceCount
 func (es Entrances) SharedEntranceIDs(appid string) []string {
 	ids := make([]string, len(es))
 	for i := range es {
-		ids[i] = es[i].SharedEntranceID(appid, i, len(es))
+		ids[i] = es[i].SharedEntranceID(appid, i)
 	}
 	return ids
 }
@@ -254,7 +251,7 @@ func (es Entrances) SharedEntranceIDs(appid string) []string {
 func (es Entrances) SharedForZone(appid, zone string) Entrances {
 	out := make(Entrances, len(es))
 	for i := range es {
-		out[i] = es[i].SharedForZone(appid, zone, i, len(es))
+		out[i] = es[i].SharedForZone(appid, zone, i)
 	}
 	return out
 }

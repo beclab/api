@@ -13,7 +13,7 @@ import (
 type DefaultThirdLevelDomainConfig struct {
 	AppName          string `json:"appName"`
 	EntranceName     string `json:"entranceName"`
-	ThirdLevelDomain string `json:"third_level_domain"`
+	ThirdLevelDomain string `json:"thirdLevelDomain"`
 }
 
 const (

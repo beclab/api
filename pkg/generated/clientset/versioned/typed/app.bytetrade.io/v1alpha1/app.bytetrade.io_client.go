@@ -16,6 +16,7 @@ type AppV1alpha1Interface interface {
 	ApplicationsGetter
 	ApplicationManagersGetter
 	ImageManagersGetter
+	ProxyListenersGetter
 }
 
 // AppV1alpha1Client is used to interact with features provided by the app.bytetrade.io group.
@@ -37,6 +38,10 @@ func (c *AppV1alpha1Client) ApplicationManagers() ApplicationManagerInterface {
 
 func (c *AppV1alpha1Client) ImageManagers() ImageManagerInterface {
 	return newImageManagers(c)
+}
+
+func (c *AppV1alpha1Client) ProxyListeners(namespace string) ProxyListenerInterface {
+	return newProxyListeners(c, namespace)
 }
 
 // NewForConfig creates a new AppV1alpha1Client for the given config.

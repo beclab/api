@@ -16,6 +16,8 @@ type Interface interface {
 	ApplicationManagers() ApplicationManagerInformer
 	// ImageManagers returns a ImageManagerInformer.
 	ImageManagers() ImageManagerInformer
+	// ProxyListeners returns a ProxyListenerInformer.
+	ProxyListeners() ProxyListenerInformer
 }
 
 type version struct {
@@ -47,4 +49,9 @@ func (v *version) ApplicationManagers() ApplicationManagerInformer {
 // ImageManagers returns a ImageManagerInformer.
 func (v *version) ImageManagers() ImageManagerInformer {
 	return &imageManagerInformer{factory: v.factory, tweakListOptions: v.tweakListOptions}
+}
+
+// ProxyListeners returns a ProxyListenerInformer.
+func (v *version) ProxyListeners() ProxyListenerInformer {
+	return &proxyListenerInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }

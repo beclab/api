@@ -17,3 +17,11 @@ type ApplicationManagerListerExpansion interface{}
 // ImageManagerListerExpansion allows custom methods to be added to
 // ImageManagerLister.
 type ImageManagerListerExpansion interface{}
+
+// ProxyListenerListerExpansion allows custom methods to be added to
+// ProxyListenerLister.
+type ProxyListenerListerExpansion interface{}
+
+// ProxyListenerNamespaceListerExpansion allows custom methods to be added to
+// ProxyListenerNamespaceLister.
+type ProxyListenerNamespaceListerExpansion interface{}

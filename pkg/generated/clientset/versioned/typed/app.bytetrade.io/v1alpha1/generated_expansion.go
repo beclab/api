@@ -9,5 +9,3 @@ type ApplicationExpansion interface{}
 type ApplicationManagerExpansion interface{}
 
 type ImageManagerExpansion interface{}
-
-type ProxyListenerExpansion interface{}

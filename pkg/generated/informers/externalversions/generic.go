@@ -46,8 +46,6 @@ func (f *sharedInformerFactory) ForResource(resource schema.GroupVersionResource
 		return &genericInformer{resource: resource.GroupResource(), informer: f.App().V1alpha1().ApplicationManagers().Informer()}, nil
 	case v1alpha1.SchemeGroupVersion.WithResource("imagemanagers"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.App().V1alpha1().ImageManagers().Informer()}, nil
-	case v1alpha1.SchemeGroupVersion.WithResource("proxylisteners"):
-		return &genericInformer{resource: resource.GroupResource(), informer: f.App().V1alpha1().ProxyListeners().Informer()}, nil
 
 		// Group=sys.bytetrade.io, Version=v1alpha1
 	case sysbytetradeiov1alpha1.SchemeGroupVersion.WithResource("appenvs"):

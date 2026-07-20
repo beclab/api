@@ -28,10 +28,6 @@ func (c *FakeAppV1alpha1) ImageManagers() v1alpha1.ImageManagerInterface {
 	return newFakeImageManagers(c)
 }
 
-func (c *FakeAppV1alpha1) ProxyListeners(namespace string) v1alpha1.ProxyListenerInterface {
-	return newFakeProxyListeners(c, namespace)
-}
-
 // RESTClient returns a RESTClient that is used to communicate
 // with API server by this client implementation.
 func (c *FakeAppV1alpha1) RESTClient() rest.Interface {

@@ -115,7 +115,6 @@ type Entrance struct {
 	WindowPushState bool   `yaml:"windowPushState,omitempty" json:"windowPushState,omitempty"`
 	Skip            bool   `yaml:"skip,omitempty" json:"skip,omitempty"`
 	Type            string `yaml:"type,omitempty" json:"type,omitempty"`
-	PodIP           string `yaml:"podIP,omitempty" json:"podIP,omitempty"`
 }
 
 type ServicePort struct {

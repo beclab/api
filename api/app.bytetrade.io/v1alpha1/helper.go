@@ -26,9 +26,20 @@ const (
 
 	AppVersionV1 = "v1"
 
-	// userSettingsKeyAuthLevel is the key inside Spec.UserSettings[user]
-	// that stores a JSON blob mapping entrance name → auth level.
+	// userSettingsKeyAuthLevel is the override key that stores a JSON blob
+	// mapping entrance name → auth level. It lives in Spec.UserSettings[user]
+	// for shared apps and in Spec.Settings for non-shared apps.
 	userSettingsKeyAuthLevel = "authLevel"
+
+	// userSettingsKeyEntranceOverrides is the override key that stores a JSON
+	// blob mapping entrance name → EntranceOverride (the user-editable non-auth
+	// fields of an entrance). Same location rules as userSettingsKeyAuthLevel.
+	userSettingsKeyEntranceOverrides = "entranceOverrides"
+
+	// userSettingsKeyAddedEntrances is the override key that stores a JSON array
+	// ([]Entrance) of entrances added on top of the chart-derived
+	// Spec.Entrances. Same location rules as userSettingsKeyAuthLevel.
+	userSettingsKeyAddedEntrances = "addedEntrances"
 
 	settingsKeyCustomDomain = "customDomain"
 	// settingsKeyDefaultThirdLevelDomainConfig stores per-app default third-level
@@ -60,12 +71,67 @@ func IsShared(o metav1.Object) bool {
 	return o.GetLabels()[AppSharedLabel] == AppSharedTrue
 }
 
-// EffectiveSettings returns Spec.Settings overlaid with UserSettings[user]
-// for v3 apps. For v1/v2 (no v3 label) it returns a copy of Spec.Settings
-// as-is. The overlay is value-level on the top-level keys (e.g.
-// "policy" / "customDomain" / "authLevel"); each value is a JSON blob
-// keyed by entrance name that callers parse as today. Missing keys fall
-// back to Spec.Settings. The returned map is always a fresh copy and
+// EntranceOverride carries the user-editable, non-auth fields of an Entrance.
+// All fields are pointers so an unset field leaves the base (chart) value
+// untouched — this distinguishes "not overridden" from a zero value, which
+// matters for the bool fields where false is a legitimate override. AuthLevel
+// is intentionally excluded: it keeps its own dedicated UserSettings key
+// (userSettingsKeyAuthLevel) for backward compatibility.
+type EntranceOverride struct {
+	Title           *string `json:"title,omitempty"`
+	Icon            *string `json:"icon,omitempty"`
+	Invisible       *bool   `json:"invisible,omitempty"`
+	OpenMethod      *string `json:"openMethod,omitempty"`
+	WindowPushState *bool   `json:"windowPushState,omitempty"`
+	URL             *string `json:"url,omitempty"`
+}
+
+// applyTo overwrites the set fields of the override onto the entrance.
+func (o EntranceOverride) applyTo(e *Entrance) {
+	if o.Title != nil {
+		e.Title = *o.Title
+	}
+	if o.Icon != nil {
+		e.Icon = *o.Icon
+	}
+	if o.Invisible != nil {
+		e.Invisible = *o.Invisible
+	}
+	if o.OpenMethod != nil {
+		e.OpenMethod = *o.OpenMethod
+	}
+	if o.WindowPushState != nil {
+		e.WindowPushState = *o.WindowPushState
+	}
+	if o.URL != nil {
+		e.URL = *o.URL
+	}
+}
+
+// overrideView returns the map that holds the user/background overrides for the
+// given caller, and whether any override view applies. Shared (v3) apps keep a
+// per-user override map at Spec.UserSettings[user]; a caller-less lookup ("")
+// has no view. Non-shared (v1/v2/v3) apps keep their overrides in the app-global
+// Spec.Settings itself, so that map is returned regardless of the caller. Safe
+// on nil.
+func (app *Application) overrideView(user string) (map[string]string, bool) {
+	if app == nil {
+		return nil, false
+	}
+	if IsShared(app) {
+		if user == "" {
+			return nil, false
+		}
+		overlay, ok := app.Spec.UserSettings[user]
+		return overlay, ok
+	}
+	return app.Spec.Settings, true
+}
+
+// EffectiveSettings returns Spec.Settings, overlaid with the per-user
+// Spec.UserSettings[user] entry for shared (v3) apps. Non-shared apps store
+// their overrides directly in Spec.Settings, so their effective settings are
+// just a copy of Spec.Settings. The returned map is always a fresh copy and
 // never aliases the CR. Safe to call on a nil receiver.
 func (app *Application) EffectiveSettings(user string) map[string]string {
 	if app == nil {
@@ -78,7 +144,6 @@ func (app *Application) EffectiveSettings(user string) map[string]string {
 	if !IsShared(app) || user == "" {
 		return out
 	}
-
 	overlay, ok := app.Spec.UserSettings[user]
 	if !ok {
 		return out
@@ -89,38 +154,58 @@ func (app *Application) EffectiveSettings(user string) map[string]string {
 	return out
 }
 
-// EffectiveEntrances returns a copy of Spec.Entrances with each entry's
-// AuthLevel replaced by UserSettings[user]["authLevel"][name] when present.
-// For v1/v2 apps it returns a copy of Spec.Entrances. The original CR is
-// never mutated. A malformed authLevel overlay is ignored — callers fall
-// back to the global Entrances rather than crashing because one user wrote
-// junk into the CR. Safe to call on a nil receiver.
+// EffectiveEntrances returns a copy of Spec.Entrances (the chart-derived base)
+// with the applicable overrides applied: user-added entrances are appended,
+// per-entrance AuthLevel is replaced from the "authLevel" blob, and remaining
+// user-editable fields are replaced from the "entranceOverrides" blob. The
+// override source is the per-user Spec.UserSettings[user] map for shared (v3)
+// apps and Spec.Settings for non-shared apps. The original CR is never mutated.
+// Any malformed override blob is ignored — callers fall back to the base rather
+// than crashing because someone wrote junk into the CR. Safe to call on a nil
+// receiver.
 func (app *Application) EffectiveEntrances(user string) []Entrance {
 	if app == nil {
 		return nil
 	}
 	out := make([]Entrance, len(app.Spec.Entrances))
 	copy(out, app.Spec.Entrances)
-	if !IsShared(app) || user == "" {
+
+	overlay, ok := app.overrideView(user)
+	if !ok || overlay == nil {
 		return out
 	}
-	overlay, ok := app.Spec.UserSettings[user]
-	if !ok {
-		return out
-	}
-	authBlob, ok := overlay[userSettingsKeyAuthLevel]
-	if !ok || authBlob == "" {
-		return out
-	}
-	var perEntrance map[string]string
-	if err := json.Unmarshal([]byte(authBlob), &perEntrance); err != nil {
-		return out
-	}
-	for i := range out {
-		if lvl, ok := perEntrance[out[i].Name]; ok && lvl != "" {
-			out[i].AuthLevel = lvl
+
+	// Append user-added entrances first so the per-name overlays below can
+	// also apply to them (e.g. an authLevel change on an added entrance).
+	if added := overlay[userSettingsKeyAddedEntrances]; added != "" {
+		var addedEntrances []Entrance
+		if err := json.Unmarshal([]byte(added), &addedEntrances); err == nil {
+			out = append(out, addedEntrances...)
 		}
 	}
+
+	if authBlob := overlay[userSettingsKeyAuthLevel]; authBlob != "" {
+		var perEntrance map[string]string
+		if err := json.Unmarshal([]byte(authBlob), &perEntrance); err == nil {
+			for i := range out {
+				if lvl, ok := perEntrance[out[i].Name]; ok && lvl != "" {
+					out[i].AuthLevel = lvl
+				}
+			}
+		}
+	}
+
+	if ovBlob := overlay[userSettingsKeyEntranceOverrides]; ovBlob != "" {
+		var perEntrance map[string]EntranceOverride
+		if err := json.Unmarshal([]byte(ovBlob), &perEntrance); err == nil {
+			for i := range out {
+				if ov, ok := perEntrance[out[i].Name]; ok {
+					ov.applyTo(&out[i])
+				}
+			}
+		}
+	}
+
 	return out
 }
 

@@ -318,17 +318,103 @@ func TestEffectiveEntrances(t *testing.T) {
 	})
 }
 
+func TestEffectiveEntrancesSettingsOverlay(t *testing.T) {
+	base := []Entrance{
+		{Name: "web", Host: "h1", Port: 80, AuthLevel: "public", Title: "Web"},
+	}
+
+	t.Run("non-shared applies authLevel override from Spec.Settings for any user", func(t *testing.T) {
+		app := newV1App(ApplicationSpec{
+			Entrances: base,
+			Settings:  map[string]string{userSettingsKeyAuthLevel: `{"web":"private"}`},
+		})
+		got := app.EffectiveEntrances("anyone")
+		if got[0].AuthLevel != "private" {
+			t.Fatalf("authLevel = %q, want private", got[0].AuthLevel)
+		}
+		// Base CR must stay untouched.
+		if app.Spec.Entrances[0].AuthLevel != "public" {
+			t.Fatal("EffectiveEntrances mutated Spec.Entrances")
+		}
+	})
+
+	t.Run("non-shared applies entranceOverrides from Spec.Settings", func(t *testing.T) {
+		app := newV1App(ApplicationSpec{
+			Entrances: base,
+			Settings:  map[string]string{userSettingsKeyEntranceOverrides: `{"web":{"title":"Custom","invisible":true}}`},
+		})
+		got := app.EffectiveEntrances("")
+		if got[0].Title != "Custom" || !got[0].Invisible {
+			t.Fatalf("override not applied: %+v", got[0])
+		}
+	})
+
+	t.Run("non-shared appends addedEntrances from Spec.Settings", func(t *testing.T) {
+		app := newV1App(ApplicationSpec{
+			Entrances: base,
+			Settings:  map[string]string{userSettingsKeyAddedEntrances: `[{"name":"extra","host":"h2","port":81,"authLevel":"internal"}]`},
+		})
+		got := app.EffectiveEntrances("")
+		if len(got) != 2 || got[1].Name != "extra" || got[1].AuthLevel != "internal" {
+			t.Fatalf("addedEntrances not appended: %+v", got)
+		}
+	})
+
+	t.Run("authLevel override also applies to added entrances by name", func(t *testing.T) {
+		app := newV1App(ApplicationSpec{
+			Entrances: base,
+			Settings: map[string]string{
+				userSettingsKeyAddedEntrances: `[{"name":"extra","host":"h2","port":81,"authLevel":"internal"}]`,
+				userSettingsKeyAuthLevel:      `{"extra":"public"}`,
+			},
+		})
+		got := app.EffectiveEntrances("")
+		var extra *Entrance
+		for i := range got {
+			if got[i].Name == "extra" {
+				extra = &got[i]
+			}
+		}
+		if extra == nil || extra.AuthLevel != "public" {
+			t.Fatalf("added entrance authLevel override = %+v", extra)
+		}
+	})
+
+	t.Run("shared app ignores Spec.Settings overrides and uses per-user overlay", func(t *testing.T) {
+		app := newSharedApp(ApplicationSpec{
+			Entrances: base,
+			Settings:  map[string]string{userSettingsKeyAuthLevel: `{"web":"private"}`},
+		})
+		got := app.EffectiveEntrances("alice")
+		if got[0].AuthLevel != "public" {
+			t.Fatalf("shared app should ignore Spec.Settings override, got %q", got[0].AuthLevel)
+		}
+	})
+}
+
+func TestEffectiveSettingsNonShared(t *testing.T) {
+	t.Run("non-shared returns Spec.Settings (overrides live there) for any user", func(t *testing.T) {
+		app := newV1App(ApplicationSpec{
+			Settings: map[string]string{"policy": "override", settingsKeyCustomDomain: "cd", "title": "T"},
+		})
+		got := app.EffectiveSettings("")
+		if got["policy"] != "override" || got[settingsKeyCustomDomain] != "cd" || got["title"] != "T" {
+			t.Fatalf("non-shared settings = %v", got)
+		}
+	})
+}
+
 func TestThirdLevelCusDomainPrefixes(t *testing.T) {
 	t.Run("nil app returns nil", func(t *testing.T) {
 		var app *Application
-		if got := app.ThirdLevelCusDomainURLs(""); got != nil {
+		if got := app.ThirdLevelCusDomainURLs("", ""); got != nil {
 			t.Fatalf("ThirdLevelCusDomainURLs(nil) = %v, want nil", got)
 		}
 	})
 
 	t.Run("no entrances returns nil", func(t *testing.T) {
 		app := newV1App(ApplicationSpec{Appid: "abc123", Owner: "alice"})
-		if got := app.ThirdLevelCusDomainURLs(""); got != nil {
+		if got := app.ThirdLevelCusDomainURLs("", "alice"); got != nil {
 			t.Fatalf("ThirdLevelCusDomainURLs(no entrances) = %v, want nil", got)
 		}
 	})
@@ -348,7 +434,7 @@ func TestThirdLevelCusDomainPrefixes(t *testing.T) {
 				},
 			},
 		})
-		got := app.ThirdLevelCusDomainURLs("")
+		got := app.ThirdLevelCusDomainURLs("", "olaresid")
 		want := []string{}
 		if !reflect.DeepEqual(got, want) {
 			t.Fatalf("ThirdLevelCusDomainURLs(empty zone) = %v, want %v", got, want)
@@ -370,7 +456,7 @@ func TestThirdLevelCusDomainPrefixes(t *testing.T) {
 				},
 			},
 		})
-		got := app.ThirdLevelCusDomainURLs("olaresid.olares.cn")
+		got := app.ThirdLevelCusDomainURLs("olaresid.olares.cn", "olaresid")
 		want := []string{"qq.olaresid.olares.cn"}
 		if !reflect.DeepEqual(got, want) {
 			t.Fatalf("ThirdLevelCusDomainURLs(with zone) = %v, want %v", got, want)
@@ -390,7 +476,7 @@ func TestThirdLevelCusDomainPrefixes(t *testing.T) {
 				},
 			},
 		})
-		got := app.ThirdLevelCusDomainURLs("olares.cn")
+		got := app.ThirdLevelCusDomainURLs("olares.cn", "alice")
 		if len(got) != 0 {
 			t.Fatalf("ThirdLevelCusDomainURLs(wrong key) = %v, want empty", got)
 		}

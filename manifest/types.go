@@ -34,46 +34,12 @@ type AppConfiguration struct {
 	Options       Options                 `yaml:"options,omitempty" json:"options,omitempty" description:"app options"`
 	Provider      []Provider              `yaml:"provider,omitempty" json:"provider,omitempty" description:"app provider information"`
 	Envs          []sysv1alpha1.AppEnvVar `yaml:"envs,omitempty" json:"envs,omitempty"`
-	Secrets       []AppSecret             `yaml:"secrets,omitempty" json:"secrets,omitempty" description:"olares-provided env vars materialized as kubernetes secrets"`
+	Secrets       []sysv1alpha1.AppSecretVar `yaml:"secrets,omitempty" json:"secrets,omitempty" description:"olares-provided env vars materialized as kubernetes secrets"`
 
 	// Only for v2 c/s apps to share the api to other cluster scope apps
 	SharedEntrances  []v1alpha1.Entrance `yaml:"sharedEntrances,omitempty" json:"sharedEntrances,omitempty"`
 	OverlayGateway   OverlayGateway      `yaml:"overlayGateway,omitempty" json:"overlayGateway,omitempty"`
 	WorkloadReplicas *WorkloadReplicas   `yaml:"workloadReplicas,omitempty" json:"workloadReplicas,omitempty"`
-}
-
-// AppSecretValueKey is the data key every generated Secret stores its value
-// under. It is a constant so chart authors can write a plain secretKeyRef
-// without templating anything:
-//
-//	valueFrom:
-//	  secretKeyRef:
-//	    name: <AppSecret.Name>
-//	    key: value
-const AppSecretValueKey = "value"
-
-// AppSecret pulls one Olares-provided env var (a SystemEnv or UserEnv, referenced
-// exactly like envs[].valueFrom) into a dedicated Kubernetes Secret in the app's
-// namespace. The app's chart then consumes it through a standard secretKeyRef
-// instead of receiving the value as a plaintext env var, which keeps the value
-// out of the pod spec.
-//
-// This is a transition helper built from existing primitives: the pull-and-resolve
-// half is shared with envs[], only the materialization differs. It is expected to
-// be superseded once Olares provides first-class secrets.
-//
-// TODO(structured-secrets): today one entry produces exactly one Secret holding a
-// single value under AppSecretValueKey. Once the Olares UX can author and manage
-// multi-key secrets, extend this to let several keys share one Secret (and to
-// carry secret types beyond Opaque).
-type AppSecret struct {
-	// Name is the Secret's name in the app namespace, used verbatim. Chart
-	// authors hardcode this exact string in their secretKeyRef.
-	Name string `yaml:"name" json:"name"`
-
-	// ValueFrom references the Olares-provided env var to pull the value from.
-	// Reuses the envs[].valueFrom reference type so the two pull the same way.
-	ValueFrom *sysv1alpha1.ValueFrom `yaml:"valueFrom,omitempty" json:"valueFrom,omitempty"`
 }
 
 type WorkloadReplicas map[string]int32

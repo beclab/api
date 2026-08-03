@@ -498,3 +498,12 @@ func (app *Application) GenEntranceURLs(zone string) ([]Entrance, error) {
 	}
 	return app.EntrancesWithZone(zone)
 }
+
+func ResolveEntranceIDWithDefaultThirdLevelDomainOverride(entrances []*Entrance, index int, appid string, configs []DefaultThirdLevelDomainConfig) string {
+	for _, cfg := range configs {
+		if cfg.EntranceName == entrances[index].Name && cfg.ThirdLevelDomain != "" {
+			return cfg.ThirdLevelDomain
+		}
+	}
+	return EntranceID(appid, index, len(entrances))
+}

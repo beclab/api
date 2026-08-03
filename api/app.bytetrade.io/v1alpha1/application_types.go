@@ -112,9 +112,15 @@ type Entrance struct {
 	// Optional. if invisible=true.
 	OpenMethod string `yaml:"openMethod,omitempty" json:"openMethod,omitempty"`
 
-	WindowPushState bool   `yaml:"windowPushState,omitempty" json:"windowPushState,omitempty"`
-	Skip            bool   `yaml:"skip,omitempty" json:"skip,omitempty"`
-	Type            string `yaml:"type,omitempty" json:"type,omitempty"`
+	WindowPushState bool `yaml:"windowPushState,omitempty" json:"windowPushState,omitempty"`
+	Skip            bool `yaml:"skip,omitempty" json:"skip,omitempty"`
+
+	// Type is the entrance type from the Application CR. A "dev" entrance's
+	// Host is the backing pod IP (written by proxylistener), and it is routed
+	// straight to that IP as a STATIC cluster instead of a Kubernetes service
+	// DNS name (see translator.buildAppVirtualHosts). It also gets a
+	// `<appid>-<port>.<zone>` alias.
+	Type string `yaml:"type,omitempty" json:"type,omitempty"`
 }
 
 type ServicePort struct {

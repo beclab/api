@@ -130,6 +130,9 @@ type Permission struct {
 	ExternalData   bool                 `yaml:"externalData,omitempty" json:"externalData,omitempty"`
 	Provider       []ProviderPermission `yaml:"provider,omitempty" json:"provider,omitempty"  description:"system shared data permission for accessing"`
 	ServiceAccount *string              `yaml:"serviceAccount,omitempty" json:"serviceAccount,omitempty" description:"service account for app permission"`
+	// LoginOlaresCLI requests a long-lived Olares credential to be mounted into the
+	// app containers. Restricted to an allowlist enforced by oac validation.
+	LoginOlaresCLI bool `yaml:"loginOlaresCLI,omitempty" json:"loginOlaresCLI,omitempty" description:"mount a long-lived Olares credential for olares-cli login"`
 }
 
 type ProviderPermission struct {

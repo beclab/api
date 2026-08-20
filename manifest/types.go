@@ -92,6 +92,7 @@ type AppSpec struct {
 		Text string `yaml:"text,omitempty" json:"text,omitempty"`
 		URL  string `yaml:"url,omitempty" json:"url,omitempty"`
 	} `yaml:"license,omitempty" json:"license,omitempty"`
+	ChartRepo string `yaml:"chartRepo,omitempty" json:"chartRepo,omitempty"`
 }
 
 type Hardware struct {

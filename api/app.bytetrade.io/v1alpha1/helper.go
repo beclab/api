@@ -53,6 +53,8 @@ const (
 
 	AppSharedLabel = "app.bytetrade.io/app-shared"
 	AppSharedTrue  = "true"
+
+	sharedZone = "shared.olares.com"
 )
 
 // IsV3 reports whether the given object (Application or ApplicationManager)
@@ -332,7 +334,7 @@ func (e Entrance) SharedEntranceIDV2(appid string, entranceIndex, entranceCount 
 // mutated.
 func (e Entrance) SharedForZone(appid, zone string, entranceIndex, entranceCount int) Entrance {
 	out := e
-	out.URL = fmt.Sprintf("%s.%s", e.SharedEntranceID(appid, entranceIndex, entranceCount), zone)
+	out.URL = fmt.Sprintf("%s.%s", e.SharedEntranceID(appid, entranceIndex, entranceCount), sharedZone)
 	return out
 }
 
@@ -341,7 +343,7 @@ func (e Entrance) SharedForZone(appid, zone string, entranceIndex, entranceCount
 // mutated.
 func (e Entrance) SharedForZoneV2(appid, zone string, entranceIndex, entranceCount int) Entrance {
 	out := e
-	out.URL = fmt.Sprintf("%s.%s", e.SharedEntranceIDV2(appid, entranceIndex, entranceCount), zone)
+	out.URL = fmt.Sprintf("%s.%s", e.SharedEntranceIDV2(appid, entranceIndex, entranceCount), sharedZone)
 	return out
 }
 

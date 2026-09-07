@@ -34,6 +34,7 @@ type AppConfiguration struct {
 	Options       Options                 `yaml:"options,omitempty" json:"options,omitempty" description:"app options"`
 	Provider      []Provider              `yaml:"provider,omitempty" json:"provider,omitempty" description:"app provider information"`
 	Envs          []sysv1alpha1.AppEnvVar `yaml:"envs,omitempty" json:"envs,omitempty"`
+	Secrets       []sysv1alpha1.AppSecretVar `yaml:"secrets,omitempty" json:"secrets,omitempty" description:"olares-provided env vars materialized as kubernetes secrets"`
 
 	// Only for v2 c/s apps to share the api to other cluster scope apps
 	SharedEntrances  []v1alpha1.Entrance `yaml:"sharedEntrances,omitempty" json:"sharedEntrances,omitempty"`

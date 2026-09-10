@@ -17,6 +17,13 @@ const (
 
 	Running ApplicationManagerState = "running"
 
+	// UpgradePending means the upgrade is queued for the cluster-wide
+	// download slot (shared with install Downloading).
+	UpgradePending ApplicationManagerState = "upgradePending"
+
+	// UpgradeDownloading means the upgrade is pulling images.
+	UpgradeDownloading ApplicationManagerState = "upgradeDownloading"
+
 	// Upgrading means that the upgrade operation is underway.
 	Upgrading ApplicationManagerState = "upgrading"
 
@@ -60,8 +67,10 @@ const (
 	ResumingCanceled     ApplicationManagerState = "resumingCanceled"
 
 	// PendingCanceling means that the installation operation is under canceling operation.
-	PendingCanceling      ApplicationManagerState = "pendingCanceling"
-	DownloadingCanceling  ApplicationManagerState = "downloadingCanceling"
+	PendingCanceling            ApplicationManagerState = "pendingCanceling"
+	DownloadingCanceling        ApplicationManagerState = "downloadingCanceling"
+	UpgradePendingCanceling     ApplicationManagerState = "upgradePendingCanceling"
+	UpgradeDownloadingCanceling ApplicationManagerState = "upgradeDownloadingCanceling"
 	InstallingCanceling   ApplicationManagerState = "installingCanceling"
 	InitializingCanceling ApplicationManagerState = "initializingCanceling"
 	UpgradingCanceling    ApplicationManagerState = "upgradingCanceling"
@@ -69,8 +78,10 @@ const (
 	ResumingCanceling     ApplicationManagerState = "resumingCanceling"
 	//SuspendingCanceling   ApplicationManagerState = "suspendingCanceling"
 
-	PendingCancelFailed     ApplicationManagerState = "pendingCancelFailed"
-	DownloadingCancelFailed ApplicationManagerState = "downloadingCancelFailed"
+	PendingCancelFailed            ApplicationManagerState = "pendingCancelFailed"
+	DownloadingCancelFailed        ApplicationManagerState = "downloadingCancelFailed"
+	UpgradePendingCancelFailed     ApplicationManagerState = "upgradePendingCancelFailed"
+	UpgradeDownloadingCancelFailed ApplicationManagerState = "upgradeDownloadingCancelFailed"
 	InstallingCancelFailed  ApplicationManagerState = "installingCancelFailed"
 	//InitializingCancelFailed ApplicationManagerState = "initializingCancelFailed"
 	UpgradingCancelFailed   ApplicationManagerState = "upgradingCancelFailed"

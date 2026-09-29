@@ -39,9 +39,47 @@ type AppConfiguration struct {
 	SharedEntrances  []v1alpha1.Entrance `yaml:"sharedEntrances,omitempty" json:"sharedEntrances,omitempty"`
 	OverlayGateway   OverlayGateway      `yaml:"overlayGateway,omitempty" json:"overlayGateway,omitempty"`
 	WorkloadReplicas *WorkloadReplicas   `yaml:"workloadReplicas,omitempty" json:"workloadReplicas,omitempty"`
+	WorkloadOptions  WorkloadOptions     `yaml:"workloadOptions,omitempty" json:"workloadOptions,omitempty"`
 }
 
 type WorkloadReplicas map[string]int32
+
+// WorkloadOptions declares runtime options and attachable capabilities for
+// every Deployment and StatefulSet rendered by an application chart.
+type WorkloadOptions map[string]WorkloadOption
+
+type WorkloadOption struct {
+	// Replicas is a pointer so validation can distinguish an omitted value from
+	// an explicitly requested zero replicas.
+	Replicas       *int32                  `yaml:"replicas" json:"replicas"`
+	Allow          []WorkloadCapability    `yaml:"allow,omitempty" json:"allow,omitempty"`
+	OverlayGateway *WorkloadOverlayGateway `yaml:"overlayGateway,omitempty" json:"overlayGateway,omitempty"`
+}
+
+type WorkloadCapability struct {
+	Type       string   `yaml:"type" json:"type"`
+	Containers []string `yaml:"containers" json:"containers"`
+}
+
+type WorkloadOverlayGateway struct {
+	Entrances []WorkloadOverlayEntrance `yaml:"entrances,omitempty" json:"entrances,omitempty"`
+}
+
+type WorkloadOverlayEntrance struct {
+	Title       string `yaml:"title" json:"title"`
+	Port        int32  `yaml:"port" json:"port"`
+	Description string `yaml:"description,omitempty" json:"description,omitempty"`
+	Protocol    string `yaml:"protocol" json:"protocol"`
+}
+
+const (
+	WorkloadAllowFolder       = "folder"
+	WorkloadAllowDeviceSerial = "device.serial"
+	WorkloadAllowDeviceVideo  = "device.video"
+	WorkloadAllowDeviceAudio  = "device.audio"
+	WorkloadAllowDeviceHID    = "device.hid"
+	WorkloadAllowBluetooth    = "bluetooth"
+)
 
 type OverlayGateway struct {
 	Enable    bool              `yaml:"enable" json:"enable"`

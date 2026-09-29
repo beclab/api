@@ -58,6 +58,22 @@ type ApplicationSpec struct {
 	Settings map[string]string `json:"settings,omitempty"`
 
 	UserSettings map[string]map[string]string `json:"userSettings,omitempty"`
+
+	// Attachments contains app-level folder and physical-device selections.
+	// Runtime status and display metadata are deliberately not persisted here.
+	Attachments []Attachment `json:"attachments,omitempty"`
+}
+
+// Attachment binds one workload to a user-selected folder or physical device.
+// Name is required only for folder attachments and becomes the final segment
+// of /olares/attachments/<name>. Node is required only for physical devices
+// and node-local external folders.
+type Attachment struct {
+	Workload string `json:"workload"`
+	Type     string `json:"type"`
+	Ref      string `json:"ref"`
+	Node     string `json:"node,omitempty"`
+	Name     string `json:"name,omitempty"`
 }
 
 type ACL struct {

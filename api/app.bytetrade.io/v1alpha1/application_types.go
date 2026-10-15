@@ -137,6 +137,29 @@ type Entrance struct {
 	// DNS name (see translator.buildAppVirtualHosts). It also gets a
 	// `<appid>-<port>.<zone>` alias.
 	Type string `yaml:"type,omitempty" json:"type,omitempty"`
+
+	// Timeouts are optional idle/total overrides for this entrance.
+	// When omitted, consumers use the platform catalog defaults.
+	// Do not reuse options.apiTimeout.
+	// +optional
+	Timeouts *EntranceTimeouts `yaml:"timeouts,omitempty" json:"timeouts,omitempty"`
+
+	// MaxBodySize is an optional upload size limit (Kubernetes quantity, e.g. "100Mi").
+	// Consumers enforce the platform ceiling.
+	// +optional
+	MaxBodySize string `yaml:"maxBodySize,omitempty" json:"maxBodySize,omitempty"`
+}
+
+// EntranceTimeouts holds optional per-entrance timeout overrides.
+// Bounds are enforced by app-service / timeoutprofile, not by this API package.
+type EntranceTimeouts struct {
+	// Idle is the no-byte idle limit (e.g. "900s"). Suggested bounds: [30s, 3600s].
+	// +optional
+	Idle *metav1.Duration `yaml:"idle,omitempty" json:"idle,omitempty"`
+	// Total is the end-to-end response / stream deadline (e.g. "3600s").
+	// Suggested bounds: [30s, 24h].
+	// +optional
+	Total *metav1.Duration `yaml:"total,omitempty" json:"total,omitempty"`
 }
 
 type ServicePort struct {

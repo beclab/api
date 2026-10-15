@@ -156,6 +156,26 @@ func (app *Application) EffectiveSettings(user string) map[string]string {
 	return out
 }
 
+// cloneEntrance returns a deep copy of e so nested pointer fields (e.g.
+// Timeouts) do not alias the original.
+func cloneEntrance(e Entrance) Entrance {
+	var out Entrance
+	e.DeepCopyInto(&out)
+	return out
+}
+
+// cloneEntrances returns a deep copy of in. A nil input yields nil.
+func cloneEntrances(in []Entrance) []Entrance {
+	if in == nil {
+		return nil
+	}
+	out := make([]Entrance, len(in))
+	for i := range in {
+		in[i].DeepCopyInto(&out[i])
+	}
+	return out
+}
+
 // EffectiveEntrances returns a copy of Spec.Entrances (the chart-derived base)
 // with the applicable overrides applied: user-added entrances are appended,
 // per-entrance AuthLevel is replaced from the "authLevel" blob, and remaining
@@ -169,8 +189,7 @@ func (app *Application) EffectiveEntrances(user string) []Entrance {
 	if app == nil {
 		return nil
 	}
-	out := make([]Entrance, len(app.Spec.Entrances))
-	copy(out, app.Spec.Entrances)
+	out := cloneEntrances(app.Spec.Entrances)
 
 	overlay, ok := app.overrideView(user)
 	if !ok || overlay == nil {
@@ -237,7 +256,7 @@ func (e Entrance) EntranceID(appid string, entranceIndex, entranceCount int) str
 // "<entranceID>.<zone>" for the given appid, honouring the single-entrance
 // rule. The receiver is never mutated.
 func (e Entrance) ForZone(appid, zone string, entranceIndex, entranceCount int) Entrance {
-	out := e
+	out := cloneEntrance(e)
 	out.URL = fmt.Sprintf("%s.%s", e.EntranceID(appid, entranceIndex, entranceCount), zone)
 	return out
 }
@@ -333,7 +352,7 @@ func (e Entrance) SharedEntranceIDV2(appid string, entranceIndex, entranceCount 
 // to "<sharedEntranceID>.<zone>" for the given appid. The receiver is never
 // mutated.
 func (e Entrance) SharedForZone(appid, zone string, entranceIndex, entranceCount int) Entrance {
-	out := e
+	out := cloneEntrance(e)
 	out.URL = fmt.Sprintf("%s.%s", e.SharedEntranceID(appid, entranceIndex, entranceCount), sharedZone)
 	return out
 }
@@ -342,7 +361,7 @@ func (e Entrance) SharedForZone(appid, zone string, entranceIndex, entranceCount
 // to "<sharedEntranceID>.<zone>" for the given appid. The receiver is never
 // mutated.
 func (e Entrance) SharedForZoneV2(appid, zone string, entranceIndex, entranceCount int) Entrance {
-	out := e
+	out := cloneEntrance(e)
 	out.URL = fmt.Sprintf("%s.%s", e.SharedEntranceIDV2(appid, entranceIndex, entranceCount), sharedZone)
 	return out
 }
@@ -457,8 +476,7 @@ func (app *Application) EntrancesWithZone(zone string) ([]Entrance, error) {
 	if app == nil {
 		return nil, nil
 	}
-	out := make([]Entrance, len(app.Spec.Entrances))
-	copy(out, app.Spec.Entrances)
+	out := cloneEntrances(app.Spec.Entrances)
 	if zone == "" {
 		return out, nil
 	}

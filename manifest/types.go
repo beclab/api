@@ -15,6 +15,7 @@ type AppMetaData struct {
 	Title       string   `yaml:"title" json:"title"`
 	Version     string   `yaml:"version" json:"version"`
 	Categories  []string `yaml:"categories,omitempty" json:"categories,omitempty"`
+	Tags        []string `yaml:"tags,omitempty" json:"tags,omitempty"`
 	Rating      float32  `yaml:"rating,omitempty" json:"rating,omitempty"`
 	Target      string   `yaml:"target,omitempty" json:"target,omitempty"`
 	Type        string   `yaml:"type,omitempty" json:"type,omitempty"`

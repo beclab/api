@@ -96,6 +96,7 @@ type OverlayEntrance struct {
 }
 
 type AppSpec struct {
+	Namespace           string         `yaml:"namespace,omitempty" json:"namespace,omitempty"`
 	OnlyAdmin           bool           `yaml:"onlyAdmin,omitempty" json:"onlyAdmin,omitempty"`
 	VersionName         string         `yaml:"versionName" json:"versionName"`
 	FullDescription     string         `yaml:"fullDescription,omitempty" json:"fullDescription,omitempty"`
@@ -114,6 +115,7 @@ type AppSpec struct {
 	LimitedCPU          string         `yaml:"limitedCpu,omitempty" json:"limitedCpu,omitempty"`
 	SupportClient       SupportClient  `yaml:"supportClient,omitempty" json:"supportClient,omitempty"`
 	RunAsUser           bool           `yaml:"runAsUser" json:"runAsUser"`
+	RunAsInternal       bool           `yaml:"runAsInternal" json:"runAsInternal"`
 	PodGPUConsumePolicy string         `yaml:"podGpuConsumePolicy,omitempty" json:"podGpuConsumePolicy,omitempty"`
 	SubCharts           []Chart        `yaml:"subCharts,omitempty" json:"subCharts,omitempty"`
 	Hardware            Hardware       `yaml:"hardware,omitempty" json:"hardware,omitempty"`

@@ -114,7 +114,6 @@ type AppSpec struct {
 	LimitedCPU          string         `yaml:"limitedCpu,omitempty" json:"limitedCpu,omitempty"`
 	SupportClient       SupportClient  `yaml:"supportClient,omitempty" json:"supportClient,omitempty"`
 	RunAsUser           bool           `yaml:"runAsUser" json:"runAsUser"`
-	RunAsInternal       bool           `yaml:"runAsInternal" json:"runAsInternal"`
 	PodGPUConsumePolicy string         `yaml:"podGpuConsumePolicy,omitempty" json:"podGpuConsumePolicy,omitempty"`
 	SubCharts           []Chart        `yaml:"subCharts,omitempty" json:"subCharts,omitempty"`
 	Hardware            Hardware       `yaml:"hardware,omitempty" json:"hardware,omitempty"`

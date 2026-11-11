@@ -96,7 +96,6 @@ type OverlayEntrance struct {
 }
 
 type AppSpec struct {
-	Namespace           string         `yaml:"namespace,omitempty" json:"namespace,omitempty"`
 	OnlyAdmin           bool           `yaml:"onlyAdmin,omitempty" json:"onlyAdmin,omitempty"`
 	VersionName         string         `yaml:"versionName" json:"versionName"`
 	FullDescription     string         `yaml:"fullDescription,omitempty" json:"fullDescription,omitempty"`

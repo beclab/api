@@ -54,6 +54,39 @@ type WorkloadOption struct {
 	Replicas       *int32                  `yaml:"replicas" json:"replicas"`
 	Allow          []WorkloadCapability    `yaml:"allow,omitempty" json:"allow,omitempty"`
 	OverlayGateway *WorkloadOverlayGateway `yaml:"overlayGateway,omitempty" json:"overlayGateway,omitempty"`
+	// Accelerator makes this workload a GPU consumer. When any workload
+	// declares one, spec.accelerator and spec.podGpuConsumePolicy must be empty.
+	Accelerator *WorkloadAccelerator `yaml:"accelerator,omitempty" json:"accelerator,omitempty"`
+}
+
+// WorkloadAccelerator is one consumer's demand: how its replicas split the
+// cards assigned in Settings, which container receives them, and the
+// alternative modes of which exactly one is selected at install.
+type WorkloadAccelerator struct {
+	PerPod     string         `yaml:"perPod,omitempty" json:"perPod,omitempty"`
+	Containers []string       `yaml:"containers,omitempty" json:"containers,omitempty"`
+	Modes      []ResourceMode `yaml:"modes" json:"modes"`
+}
+
+const (
+	// PerPodOne gives every replica one card; replicas follow the card count.
+	PerPodOne = "one"
+	// PerPodAll gives a replica every assigned card on its node; replicas
+	// follow the node count.
+	PerPodAll = "all"
+	// PerPodSplit fixes replicas and gives each replica cards/replicas cards
+	// on one node.
+	PerPodSplit = "split"
+)
+
+// HasAccelerator reports whether any workload declares a GPU consumer.
+func (o WorkloadOptions) HasAccelerator() bool {
+	for _, option := range o {
+		if option.Accelerator != nil {
+			return true
+		}
+	}
+	return false
 }
 
 type WorkloadCapability struct {
